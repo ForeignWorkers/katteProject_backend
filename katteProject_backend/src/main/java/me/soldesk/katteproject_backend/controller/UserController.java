@@ -1,6 +1,7 @@
 package me.soldesk.katteproject_backend.controller;
 
 import common.bean.UserBean;
+import common.bean.UserPaymentBean;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import me.soldesk.katteproject_backend.service.UserService;
@@ -97,5 +98,20 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@RequestParam String user_id) {
         userService.deleteUserInfo(user_id);
         return ResponseEntity.ok(user_id + "유저가 삭제 되었습니다.");
+    }
+
+    @GetMapping("/user/login")
+    public ResponseEntity<Boolean> login(@RequestBody Map<String,String> loginData) {
+        String email_id = loginData.get("email_id");
+        String password = loginData.get("password");
+
+        boolean result = userService.existsUserInfo(email_id, password);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/user/payment")
+    public ResponseEntity<UserPaymentBean> payment(@RequestParam String user_id) {
+        UserPaymentBean getData = userService.getUserPayment(user_id);
+        return ResponseEntity.ok(getData);
     }
 }
