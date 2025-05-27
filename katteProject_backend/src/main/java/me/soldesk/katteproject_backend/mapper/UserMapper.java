@@ -1,9 +1,8 @@
 package me.soldesk.katteproject_backend.mapper;
 
 import common.bean.UserBean;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.*;
+
 @Mapper
 public interface UserMapper {
     @Insert("INSERT INTO user_info (" +
@@ -13,6 +12,33 @@ public interface UserMapper {
             "#{email_id}, #{password}, #{first_name}, #{second_name}, #{nickname}, " +
             "#{phone_number}, #{birth_date}, #{profile_url}, #{is_admin}" +
             ")")
-    @Options(useGeneratedKeys = true, keyProperty = "user_id")  // ✅ 이 부분이 핵심!
+    @Options(useGeneratedKeys = true, keyProperty = "user_id")
     void addUserInfo(UserBean user);
+
+    @Select("SELECT * FROM user_info WHERE user_id = #{user_id}")
+    UserBean getUserInfoById(int user_id);
+
+    @Select("SELECT * FROM user_info WHERE email_id = #{email_id}")
+    UserBean getUserInfoByEmail(String email_id);
+
+    @Update("UPDATE user_info SET email_id = #{email_id} WHERE user_id = #{user_id}")
+    void updateUserInfoMail(int user_id, String email_id);
+
+    @Update("UPDATE user_info SET password = #{password} WHERE user_id = #{user_id}")
+    void updateUserInfoPassword(int user_id, String password);
+
+    @Update("UPDATE user_info SET nickname = #{nickname} WHERE user_id = #{user_id}")
+    void updateUserInfoNickname(int user_id, String nickname);
+
+    @Update("UPDATE user_info SET phone_number = #{phone} WHERE user_id = #{user_id}")
+    void updateUserInfoPhone(int user_id, String phone);
+
+    @Update("UPDATE user_info SET introduce_desc = #{introduce_desc} WHERE user_id = #{user_id}")
+    void updateUserInfoIntroduce(int user_id, String introduce_desc);
+
+    @Update("UPDATE user_info SET profile_url = #{profile_url} WHERE user_id = #{user_id}")
+    void updateUserInfoProfileUrl(int user_id, String profile_url);
+
+    @Delete("DELETE FROM user_info WHERE user_id = #{user_id}")
+    void deleteUserInfoById(int user_id);
 }
