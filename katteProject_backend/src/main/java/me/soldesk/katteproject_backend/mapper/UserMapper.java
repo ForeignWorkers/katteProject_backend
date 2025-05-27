@@ -1,7 +1,9 @@
 package me.soldesk.katteproject_backend.mapper;
 
 import common.bean.UserBean;
+import common.bean.UserPaymentBean;
 import org.apache.ibatis.annotations.*;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 @Mapper
 public interface UserMapper {
@@ -41,4 +43,24 @@ public interface UserMapper {
 
     @Delete("DELETE FROM user_info WHERE user_id = #{user_id}")
     void deleteUserInfoById(int user_id);
+
+    @Select("SELECT COUNT(*) FROM user_info WHERE email_id = #{email_id} AND password = #{password}")
+    boolean existLoginByEmailAndPassword(String email_id, String password);
+
+    @Insert("INSERT INTO user_payment (" +
+            "user_id, " +
+            "point, " +
+            "katte_money, " +
+            "locked_deposit_katte_money" +
+            ") VALUES (" +
+            "#{user_id}, " +
+            "#{point}, " +
+            "#{katte_money}, " +
+            "0" +  // 잠금 금액은 기본값 0
+            ")")
+    void createDefaultUserPayment(int user_id, int point, int katte_money);
+
+
+    @Select("SELECT * FROM user_payment WHERE user_id = #{user_id}")
+    UserPaymentBean getUserPaymentById(int user_id);
 }
