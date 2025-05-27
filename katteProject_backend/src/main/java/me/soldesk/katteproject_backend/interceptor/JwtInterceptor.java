@@ -20,8 +20,10 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
 
         // 인증 실패
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().write("Unauthorized - JWT 토큰 없음 또는 유효하지 않음");
-        return false;
+//        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//        response.getWriter().write("Unauthorized - JWT 토큰 없음 또는 유효하지 않음");
+//        return false;
+        //일단 지금은 전부 ok
+        return true;
     }
 }
