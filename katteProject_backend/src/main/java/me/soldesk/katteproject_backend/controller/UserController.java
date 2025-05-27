@@ -101,6 +101,8 @@ public class UserController {
     }
 
     @GetMapping("/user/login")
+    //API Doce
+    @Operation(summary = "로그인 가능 여부 확인", description = "바디에 유저 이메일, 비밀번호 넣기")
     public ResponseEntity<Boolean> login(@RequestBody Map<String,String> loginData) {
         String email_id = loginData.get("email_id");
         String password = loginData.get("password");
@@ -110,6 +112,8 @@ public class UserController {
     }
 
     @GetMapping("/user/payment")
+    //API Doce
+    @Operation(summary = "페이먼트 정보 조회", description = "쿼리에 유저 id 넣기")
     public ResponseEntity<UserPaymentBean> payment(@RequestParam String user_id) {
         UserPaymentBean getData = userService.getUserPayment(user_id);
         return ResponseEntity.ok(getData);
