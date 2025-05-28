@@ -1,5 +1,6 @@
 package me.soldesk.katteproject_backend.controller;
 
+import common.bean.user.UserAddressBean;
 import common.bean.user.UserBean;
 import common.bean.user.UserPaymentBean;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -53,7 +55,7 @@ public class UserController {
     }
 
     @PatchMapping("/user/password")
-    //API Doce
+    //API Docs
     @Operation(summary = "유저 비밀번호 수정", description = "쿼리에는 유저 아이디, 바디에는 password : 패스워드")
     public ResponseEntity<String> updateUserInfoPassword(@RequestParam String user_id, @RequestBody Map<String, String> password) {
         userService.updateUserInfoPassword(user_id, password.get("password"));
@@ -61,7 +63,7 @@ public class UserController {
     }
 
     @PatchMapping("/user/phone")
-    //API Doce
+    //API Docs
     @Operation(summary = "유저 전화번호 수정", description = "쿼리에는 유저 아이디, 바디에는 phone_number : 번호")
     public ResponseEntity<String> updateUserInfoPhone(@RequestParam String user_id, @RequestBody Map<String, String> phone) {
         userService.updateUserInfoPhone(user_id, phone.get("phone_number"));
@@ -69,7 +71,7 @@ public class UserController {
     }
 
     @PatchMapping("/user/nickname")
-    //API Doce
+    //API Docs
     @Operation(summary = "유저 닉네임 수정", description = "쿼리에는 유저 아이디, 바디에는 nickname : 닉네임")
     public ResponseEntity<String> updateUserInfoNickname(@RequestParam String user_id, @RequestBody Map<String, String> nickname) {
         userService.updateUserInfoNickname(user_id, nickname.get("nickname"));
@@ -77,7 +79,7 @@ public class UserController {
     }
 
     @PatchMapping("/user/introduce")
-    //API Doce
+    //API Docs
     @Operation(summary = "유저 자기소개 수정", description = "쿼리에는 유저 아이디, 바디에는 introduce : 내용")
     public ResponseEntity<String> updateUserInfoIntroduce(@RequestParam String user_id, @RequestBody Map<String, String> introduce) {
         userService.updateUserInfoIntroduce(user_id, introduce.get("introduce"));
@@ -85,7 +87,7 @@ public class UserController {
     }
 
     @PatchMapping("/user/profile_url")
-    //API Doce
+    //API Docs
     @Operation(summary = "유저 프로필 수정", description = "쿼리에는 유저 아이디, 바디에는  profile_url : 프로필 URL")
     public ResponseEntity<String> updateUserInfoProfileUrl(@RequestParam String user_id, @RequestBody Map<String, String> profile_url) {
         userService.updateUserInfoProfile(user_id, profile_url.get("profile_url"));
@@ -93,7 +95,7 @@ public class UserController {
     }
 
     @DeleteMapping("/user")
-    //API Doce
+    //API Docs
     @Operation(summary = "유저 삭제", description = "쿼리에는 유저 아이디")
     public ResponseEntity<String> deleteUser(@RequestParam String user_id) {
         userService.deleteUserInfo(user_id);
@@ -101,7 +103,7 @@ public class UserController {
     }
 
     @GetMapping("/user/login")
-    //API Doce
+    //API Docs
     @Operation(summary = "로그인 가능 여부 확인", description = "바디에 유저 이메일, 비밀번호 넣기")
     public ResponseEntity<Boolean> login(@RequestBody Map<String,String> loginData) {
         String email_id = loginData.get("email_id");
@@ -112,10 +114,41 @@ public class UserController {
     }
 
     @GetMapping("/user/payment")
-    //API Doce
+    //API Docs
     @Operation(summary = "페이먼트 정보 조회", description = "쿼리에 유저 id 넣기")
     public ResponseEntity<UserPaymentBean> payment(@RequestParam String user_id) {
         UserPaymentBean getData = userService.getUserPayment(user_id);
         return ResponseEntity.ok(getData);
+    }
+
+    @PostMapping("/user/address")
+    //API Docs
+    @Operation(summary = "유저 주소 등록", description = "유저 주소 등록하기")
+    public ResponseEntity<String> addAddress(@RequestBody UserAddressBean userAddressBean) {
+        userService.addUserAddress(userAddressBean);
+        return ResponseEntity.ok("주소 등록이 완료 되었습니다.");
+    }
+
+    @GetMapping("/user/address")
+    //API Docs
+    @Operation(summary = "유저가 등록한 주소 조회", description = "유저의 주소들 리스트 반환")
+    public ResponseEntity<List<UserAddressBean>> getUserAddress(@RequestParam String user_id) {
+        return ResponseEntity.ok(userService.getUserAddress(user_id));
+    }
+
+    @GetMapping("/user/address/main")
+    //API Docs
+    @Operation(summary = "유저의 메인 주소 조회", description = "유저의 메인 주소 반환")
+    public ResponseEntity<UserAddressBean> getAddress(@RequestParam String user_id) {
+        return ResponseEntity.ok(userService.getUserMainAddress(user_id));
+    }
+
+    @PatchMapping("/user/address/main")
+    ///API Docs
+    @Operation(summary = "유저의 메인 변경", description = "유저의 메인 주소 반환")
+    public ResponseEntity<String> setMainAddress(@RequestParam String user_id,
+                                                 @RequestParam String address_id) {
+        userService.updateMainAddress(address_id, user_id);
+        return ResponseEntity.ok("main 주소가 바뀌었습니다.");
     }
 }

@@ -1,8 +1,11 @@
 package me.soldesk.katteproject_backend.mapper;
 
+import common.bean.user.UserAddressBean;
 import common.bean.user.UserBean;
 import common.bean.user.UserPaymentBean;
 import org.apache.ibatis.annotations.*;
+
+import java.util.List;
 
 @Mapper
 public interface UserMapper {
@@ -59,7 +62,52 @@ public interface UserMapper {
             ")")
     void createDefaultUserPayment(int user_id, int point, int katte_money);
 
-
     @Select("SELECT * FROM user_payment WHERE user_id = #{user_id}")
     UserPaymentBean getUserPaymentById(int user_id);
+
+    @Insert("""
+        INSERT INTO user_address (
+        user_id,
+        name,
+        phone_number,
+        address_line01,
+        address_line02,
+        is_main
+    ) VALUES (
+        #{user_id},                              -- user_id (user_info 테이블에 존재하는 유저 ID)
+        #{name},                       -- name
+        #{phone_number},               -- phone_number
+        #{address_line01}, -- address_line01
+        #{address_line02},                 -- address_line02
+        #{is_main}                           -- is_main
+    );
+    """)
+    void addUserAddress(UserAddressBean userAddressBean);
+
+    @Select("""
+            SELECT * FROM user_address
+            WHERE user_id = #{user_id}
+            """)
+    List<UserAddressBean> getUserAddresses(int user_id);
+
+    @Select("""
+        SELECT * FROM user_address
+        WHERE user_id = #{user_id}
+        AND is_main = TRUE
+        """)
+    UserAddressBean getUserMainAddress(int user_id);
+
+    @Update("""
+        UPDATE user_address
+        SET is_main = FALSE
+        WHERE user_id = #{user_id}
+    """)
+    void resetMainAddress(int user_id);
+
+    @Update("""
+        UPDATE user_address
+        SET is_main = TRUE
+        WHERE id = #{address_id} AND user_id = #{user_id}
+    """)
+    void setMainAddress(int user_id, int address_id);
 }

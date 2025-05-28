@@ -1,12 +1,18 @@
 package me.soldesk.katteproject_backend.service;
 
+import common.bean.user.UserAddressBean;
 import common.bean.user.UserBean;
 import common.bean.user.UserPaymentBean;
+import lombok.RequiredArgsConstructor;
 import me.soldesk.katteproject_backend.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     @Autowired
     private UserMapper userMapper;
@@ -63,5 +69,23 @@ public class UserService {
 
     public UserPaymentBean getUserPayment(String user_id){
         return userMapper.getUserPaymentById(Integer.parseInt(user_id));
+    }
+
+    public void addUserAddress(UserAddressBean userAddressBean) {
+        userMapper.addUserAddress(userAddressBean);
+    }
+
+    public List<UserAddressBean> getUserAddress(String user_id) {
+        return userMapper.getUserAddresses(Integer.parseInt(user_id));
+    }
+
+    public UserAddressBean getUserMainAddress(String user_id) {
+        return userMapper.getUserMainAddress(Integer.parseInt(user_id));
+    }
+
+    @Transactional
+    public void updateMainAddress(String user_id, String address_id) {
+        userMapper.resetMainAddress(Integer.parseInt(user_id));         // 모두 false
+        userMapper.setMainAddress(Integer.parseInt(user_id), Integer.parseInt(address_id)); // 선택된 것만 true
     }
 }
