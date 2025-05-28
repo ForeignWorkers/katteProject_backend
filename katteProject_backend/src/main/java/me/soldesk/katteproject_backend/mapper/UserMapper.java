@@ -1,9 +1,8 @@
 package me.soldesk.katteproject_backend.mapper;
 
-import common.bean.UserBean;
-import common.bean.UserPaymentBean;
+import common.bean.user.UserBean;
+import common.bean.user.UserPaymentBean;
 import org.apache.ibatis.annotations.*;
-import org.springframework.web.bind.annotation.PatchMapping;
 
 @Mapper
 public interface UserMapper {

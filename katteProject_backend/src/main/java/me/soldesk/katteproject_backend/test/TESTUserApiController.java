@@ -19,8 +19,7 @@
 //
 //    @GetMapping("/resource")
 //    public ResponseEntity<byte[]> resource() throws IOException {
-//        // 이미지 경로 (예: resources/static/images/sample.png)
-//        InputStream in = getClass().getResourceAsStream("/static/images/sample.png");
+//        InputStream in = getClass().getResourceAsStream("/static/images/product_1.png");
 //
 //        if (in == null) {
 //            return ResponseEntity.notFound().build();
