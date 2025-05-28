@@ -1,7 +1,7 @@
 package me.soldesk.katteproject_backend.controller;
 
-import common.bean.UserBean;
-import common.bean.UserPaymentBean;
+import common.bean.user.UserBean;
+import common.bean.user.UserPaymentBean;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import me.soldesk.katteproject_backend.service.UserService;

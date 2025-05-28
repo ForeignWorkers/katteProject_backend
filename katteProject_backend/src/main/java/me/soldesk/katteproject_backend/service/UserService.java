@@ -1,8 +1,7 @@
 package me.soldesk.katteproject_backend.service;
 
-import common.bean.UserBean;
-import common.bean.UserPaymentBean;
-import lombok.ToString;
+import common.bean.user.UserBean;
+import common.bean.user.UserPaymentBean;
 import me.soldesk.katteproject_backend.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
