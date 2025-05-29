@@ -1,8 +1,6 @@
 package me.soldesk.katteproject_backend.mapper;
 
-import common.bean.user.UserAddressBean;
-import common.bean.user.UserBean;
-import common.bean.user.UserPaymentBean;
+import common.bean.user.*;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -110,4 +108,26 @@ public interface UserMapper {
         WHERE id = #{address_id} AND user_id = #{user_id}
     """)
     void setMainAddress(int user_id, int address_id);
+
+    @Select("SELECT katte_money FROM user_payment WHERE user_id = #{user_id}")
+    int selectKatteMoney(int user_id);
+
+    @Update("UPDATE user_payment SET katte_money = #{katte_money} WHERE user_id = #{user_id}")
+    void updateKatteMoney(int user_id, int katte_money);
+
+    @Insert("INSERT INTO user_katte_money_log " +
+            "(user_id, change_amount, reason, created_at) " +
+            "VALUE (#{user_id}, #{change_amount}, #{reason}, NOW())")
+    void addKatteMoneyLog(UserKatteMoneyLogBean userKatteMoneyLogBean);
+
+    @Insert("INSERT INTO user_katte_money_refund " +
+            "(user_id, amount, account_number, bank_type, status) " +
+            "VALUES (#{user_id}, #{amount}, #{account_number}, #{bank_type}, #{status})")
+    void addKatteMoneyRefund(UserKatteMoneyRefundBean userKatteMoneyRefundBean);
+
+    @Select("SELECT * FROM user_katte_money_refund WHERE user_id = #{user_id}")
+    List<UserKatteMoneyRefundBean> getKatteMoneyRefunds(int user_id);
+
+    @Update("UPDATE user_katte_money_refund SET status = #{status} WHERE id = #{refund_id}")
+    void updateKatteMoneyRefund(UserKatteMoneyRefundBean.status status, int refund_id);
 }
