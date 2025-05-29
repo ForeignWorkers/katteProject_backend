@@ -4,12 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import me.soldesk.katteproject_backend.service.AuctionService;
-import me.soldesk.katteproject_backend.test.ProductPriceRegisterBean;
-import org.apache.ibatis.annotations.Insert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import common.bean.auction.AuctionDataBean;
 
 import java.util.List;
 
@@ -19,21 +18,32 @@ public class AuctionController {
     @Autowired
     private AuctionService auctionService;
 
-    @PostMapping("/product/price")
+    @PostMapping("/auction")
     //API Docs
-    @Operation(summary = "경매 가격 등록", description = "판매 상품의 경매 시작가, 즉시 구매 여부, 기간 등을 등록합니다.")
+    @Operation(summary = "옥션 데이터 등록", description = "판매 상품의 경매 시작가, 즉시 구매 여부, 기간 등을 등록합니다.")
     @ApiResponse(responseCode = "200", description = "등록 성공")
     @ApiResponse(responseCode = "400", description = "파라미터 에러")
-    public ResponseEntity<String> registerAuctionPrice(
-            @RequestBody @Valid ProductPriceRegisterBean productPriceRegisterBean,
+    public ResponseEntity<String> registerAuction(
+            @RequestBody @Valid AuctionDataBean auctionBean,
             BindingResult result) {
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors().toString());
         }
 
-        auctionService.registerAuction(productPriceRegisterBean);
-        return ResponseEntity.ok("판매 상품의 경매 가격 데이터가 등록되었습니다!");
+        auctionService.registerAuction(auctionBean);
+        return ResponseEntity.ok("상품의 옥션 데이터가 등록되었습니다!");
+    }
+
+    @GetMapping("/auction")
+    @Operation(summary = "옥션 조회", description = "auction_id를 기준으로 경매 데이터를 조회합니다.")
+    public ResponseEntity<AuctionDataBean> getAuctionById(@RequestParam("auction_id") int auctionId) {
+        AuctionDataBean auction = auctionService.getAuctionById(auctionId);
+        if (auction != null) {
+            return ResponseEntity.ok(auction);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/auction/bid")

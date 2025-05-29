@@ -1,7 +1,7 @@
 package me.soldesk.katteproject_backend.mapper;
 
+import common.bean.auction.AuctionDataBean;
 import common.bean.auction.AuctionBidLog;
-import me.soldesk.katteproject_backend.test.ProductPriceRegisterBean;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -12,26 +12,33 @@ public interface AuctionMapper {
     @Insert("""
         INSERT INTO auction_data (
             product_id,
+            auction_start_time,
+            sale_period,
+            auction_end_time,
+            auction_insert_term,
             start_price,
             current_price,
-            is_instant_sale,
             instant_price,
-            sale_period,
-            auction_start_time,
-            auction_end_time
+            is_instant_sale
         ) VALUES (
-            #{productId},
-            #{startPrice},
-            #{startPrice},                -- current_price는 start_price와 동일하게 삽입
-            #{isInstantSale},
-            #{instantPrice},
-            #{salePeriod},
-            NOW(),
-            DATE_ADD(NOW(), INTERVAL ${salePeriod} DAY)
+            #{product_id},
+            #{auction_start_time},
+            #{sale_period},
+            #{auction_end_time},
+            #{auction_insert_term},
+            #{start_price}, 
+            #{current_price},
+            #{instant_price},
+            #{is_instant_sale}
         )
     """)
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    void insertAuctionData(ProductPriceRegisterBean productPriceRegisterBean);
+    void insertAuctionData(AuctionDataBean auctionBean);
+
+    @Select("""
+    SELECT * FROM auction_data WHERE id = #{auctionId}
+    """)
+    AuctionDataBean getAuctionById(@Param("auctionId") int auctionId);
 
     @Insert("INSERT INTO auction_bid_log(user_id, auction_data_id, bid_take_time, bid_price, bid_limit_time)\n" +
             "VALUES (#{user_id},#{auction_data_id},NOW(),#{bid_price},#{bid_limit_time});")
