@@ -1,12 +1,9 @@
 package me.soldesk.katteproject_backend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import common.bean.cs.CsInquireCustomerBean;
 import me.soldesk.katteproject_backend.mapper.CsMapper;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -34,15 +31,6 @@ public class CsInquireCustomerService {
             return inquireList;
         }
     }
-
-/*    public List<CsInquireCustomerBean> getCsInquireCustomerByUserId(
-            @RequestParam int user_id) {
-        return csMapper.getCsInquireCustomerByUserId(user_id);
-    }//id로 문의 내역 리스트 받기
-
-    public List<CsInquireCustomerBean> getCsInquireCustomerByUserIdAndInquireId(int user_id, int inquire_id) {
-        return csMapper.getCsInquireCustomerByUserIdAndInquireId(user_id, inquire_id);
-    }//문의 상세 내역*/
 
     public int editCsInquireCustomer(CsInquireCustomerBean csInquireCustomerBean) {
         return csMapper.updateCsInquireCustomer(
