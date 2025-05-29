@@ -1,8 +1,6 @@
 package me.soldesk.katteproject_backend.service;
 
-import common.bean.user.UserAddressBean;
-import common.bean.user.UserBean;
-import common.bean.user.UserPaymentBean;
+import common.bean.user.*;
 import lombok.RequiredArgsConstructor;
 import me.soldesk.katteproject_backend.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,5 +85,51 @@ public class UserService {
     public void updateMainAddress(String user_id, String address_id) {
         userMapper.resetMainAddress(Integer.parseInt(user_id));         // 모두 false
         userMapper.setMainAddress(Integer.parseInt(user_id), Integer.parseInt(address_id)); // 선택된 것만 true
+    }
+
+    @Transactional
+    public int updateKatteMoney(UserKatteMoneyLogBean userKatteMoneyLogBean) {
+        // 1. 로그 테이블에 기록
+        userMapper.addKatteMoneyLog(userKatteMoneyLogBean); // INSERT INTO user_katte_money_log...
+
+        // 2. 현재 잔액 가져오기
+        int currentBalance = userMapper.selectKatteMoney(userKatteMoneyLogBean.getUser_id());
+        int amount = userKatteMoneyLogBean.getChange_amount();
+
+        // 3. 새 잔액 계산
+        int updatedBalance = currentBalance;
+        switch (userKatteMoneyLogBean.getReason()) {
+            case CHARGE:
+                updatedBalance += amount;
+                break;
+            case REFUNDED:
+                updatedBalance -= amount;
+                break;
+            case USED:
+                if (currentBalance < amount) {
+                    throw new IllegalArgumentException("잔액 부족");
+                }
+                updatedBalance -= amount;
+                break;
+            default:
+                throw new IllegalArgumentException("잘못된 reason: ");
+        }
+
+        // 4. user_payment 테이블 업데이트
+        userMapper.updateKatteMoney(userKatteMoneyLogBean.getUser_id(), updatedBalance);
+
+        return updatedBalance;
+    }
+
+    public void addKatteMoneyrefund(UserKatteMoneyRefundBean userKatteMoneyRefundBean) {
+        userMapper.addKatteMoneyRefund(userKatteMoneyRefundBean);
+    }
+
+    public List<UserKatteMoneyRefundBean> getKatteMoneyRefund(int user_id) {
+        return userMapper.getKatteMoneyRefunds(user_id);
+    }
+
+    public void updateKatteMoneyRefund(UserKatteMoneyRefundBean.status status, int refund_id) {
+        userMapper.updateKatteMoneyRefund(status, refund_id);
     }
 }

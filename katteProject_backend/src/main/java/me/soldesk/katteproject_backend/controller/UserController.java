@@ -1,8 +1,6 @@
 package me.soldesk.katteproject_backend.controller;
 
-import common.bean.user.UserAddressBean;
-import common.bean.user.UserBean;
-import common.bean.user.UserPaymentBean;
+import common.bean.user.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import me.soldesk.katteproject_backend.service.UserService;
@@ -150,5 +148,36 @@ public class UserController {
                                                  @RequestParam String address_id) {
         userService.updateMainAddress(address_id, user_id);
         return ResponseEntity.ok("main 주소가 바뀌었습니다.");
+    }
+
+    @PatchMapping("/user/katte")
+    ///API Docs
+    @Operation(summary = "katte 머니 변경 요청", description = "캇테 머니 변경")
+    public ResponseEntity<String> updatekatteMoney(@RequestBody UserKatteMoneyLogBean katteMoneyLogBean) {
+        int currentMoney = userService.updateKatteMoney(katteMoneyLogBean);
+        return ResponseEntity.ok("요청이 완료 되었습니다. 현재 머니 : " + currentMoney);
+    }
+
+    @PostMapping("/user/katte/refund")
+    ///API Docs
+    @Operation(summary = "katte 머니 환불 요청", description = "환불 요청 서 생성")
+    public ResponseEntity<String> addKatteMoneyRefund(@RequestBody UserKatteMoneyRefundBean userKatteMoneyRefundBean) {
+        userService.addKatteMoneyrefund(userKatteMoneyRefundBean);
+        return ResponseEntity.ok("환불 요청서 생성 완료");
+    }
+
+    @GetMapping("/user/katte/refund")
+    @Operation(summary = "특정 유저가 요청한 환불서 조회", description = "특정 유저의 요청서 리스트로 반환")
+    public ResponseEntity<List<UserKatteMoneyRefundBean>> getKatteMoneyRefund(@RequestParam String user_id) {
+        return ResponseEntity.ok(userService.getKatteMoneyRefund(Integer.parseInt(user_id)));
+    }
+
+    @PatchMapping("/user/katte/refund")
+    ///API Docs
+    @Operation(summary = "katte 머니 환불 상태 업데이트", description = "환불서의 상태 업데이트")
+    public ResponseEntity<String> updateKatteMoneyRefund(@RequestParam UserKatteMoneyRefundBean.status status,
+                                                         @RequestParam int refund_id){
+        userService.updateKatteMoneyRefund(status, refund_id);
+        return ResponseEntity.ok(String.format("%d의 환불서의 상태가 %s로 업데이트 되었습니다.", refund_id, status));
     }
 }
