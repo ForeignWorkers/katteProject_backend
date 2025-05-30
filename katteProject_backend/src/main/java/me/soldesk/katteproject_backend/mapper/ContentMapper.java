@@ -4,7 +4,6 @@ import common.bean.content.ContentShortformBean;
 import common.bean.content.ContentStyleBean;
 import common.bean.content.ContentStyleComment;
 import org.apache.ibatis.annotations.*;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -92,19 +91,19 @@ public interface ContentMapper {
     List<ContentStyleComment> getStyleCommentByUserId(int userId, int count, int offset);
 
     @Select("SELECT COUNT(*) FROM content_stylelike WHERE style_id = #{styleId} AND user_id = #{userId}")
-    boolean hasLiked(int styleId, int userId);
+    boolean hasStyleLike(int styleId, int userId);
 
     @Insert("INSERT INTO content_stylelike(style_id, user_id, created_at) VALUES(#{styleId}, #{userId}, NOW())")
-    void addLike(int styleId, int userId);
+    void addStyleLike(int styleId, int userId);
 
     @Delete("DELETE FROM content_stylelike WHERE style_id = #{styleId} AND user_id = #{userId}")
-    void removeLike(int styleId, int userId);
+    void removeStyleLike(int styleId, int userId);
 
     @Update("UPDATE content_style SET like_count = like_count + 1 WHERE id = #{styleId}")
-    void increaseLikeCount(int styleId);
+    void increaseStyleLikeCount(int styleId);
 
     @Update("UPDATE content_style SET like_count = like_count - 1 WHERE id = #{styleId} AND like_count > 0")
-    void decreaseLikeCount(int styleId);
+    void decreaseStyleLikeCount(int styleId);
 
     @Select("""
             SELECT c.*
@@ -118,4 +117,19 @@ public interface ContentMapper {
 
     @Select("SELECT LAST_INSERT_ID()")
     int getLastInsertId();
+
+    @Select("SELECT COUNT(*) FROM content_short_like WHERE short_id = #{short_id} AND user_id = #{user_id}")
+    boolean hasShortLike(int short_id, int user_id);
+
+    @Insert("INSERT INTO content_short_like(short_id, user_id, created_at) VALUES(#{short_id}, #{user_id}, NOW())")
+    void addShortLike(int short_id, int user_id);
+
+    @Delete("DELETE FROM content_short_like WHERE short_id = #{short_id} AND user_id = #{user_id}")
+    void removeShortLike(int short_id, int user_id);
+
+    @Update("UPDATE content_shortform SET shortform_like_count = shortform_like_count + 1 WHERE id = #{short_id}")
+    void increaseShortLikeCount(int short_id);
+
+    @Update("UPDATE content_shortform SET shortform_like_count = shortform_like_count - 1 WHERE id = #{short_id} AND shortform_like_count > 0")
+    void decreaseShortLikeCount(int short_id);
 }
