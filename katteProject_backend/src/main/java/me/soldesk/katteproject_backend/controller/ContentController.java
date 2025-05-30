@@ -129,7 +129,7 @@ public class ContentController {
     @Operation(summary = "스타일 좋아요 토글", description = "특정 스타일에 대한 좋아요 토글")
     @ApiResponse(responseCode = "200", description = "성공")
     @ApiResponse(responseCode = "400", description = "파라미터 에러")
-    public ResponseEntity<Boolean> toggleLike(@RequestParam int style_id, @RequestParam int user_id) {
+    public ResponseEntity<Boolean> toggleStyleLike(@RequestParam int style_id, @RequestParam int user_id) {
         boolean liked = contentService.toggleStyleLike(style_id, user_id);
         return ResponseEntity.ok(liked);
     }
@@ -145,5 +145,15 @@ public class ContentController {
 
         List<ContentStyleBean> likedStyles = contentService.getLikedStyles(user_id, count, offset);
         return ResponseEntity.ok(likedStyles);
+    }
+
+    @PostMapping("/content/short/like")
+    //API Docs
+    @Operation(summary = "숏폼 좋아요 토글", description = "특정 숏폼에 대한 좋아요 토글")
+    @ApiResponse(responseCode = "200", description = "성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<Boolean> toggleShortLike(@RequestParam int short_id, @RequestParam int user_id) {
+        boolean liked = contentService.toggleShortLike(short_id, user_id);
+        return ResponseEntity.ok(liked);
     }
 }

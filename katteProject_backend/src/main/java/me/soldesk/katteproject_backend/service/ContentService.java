@@ -86,18 +86,30 @@ public class ContentService {
     }
 
     public boolean toggleStyleLike(int styleId, int userId) {
-        if (contentMapper.hasLiked(styleId, userId)) {
-            contentMapper.removeLike(styleId, userId);
-            contentMapper.decreaseLikeCount(styleId);
+        if (contentMapper.hasStyleLike(styleId, userId)) {
+            contentMapper.removeStyleLike(styleId, userId);
+            contentMapper.decreaseStyleLikeCount(styleId);
             return false;  // 좋아요 취소
         } else {
-            contentMapper.addLike(styleId, userId);
-            contentMapper.increaseLikeCount(styleId);
+            contentMapper.addStyleLike(styleId, userId);
+            contentMapper.increaseStyleLikeCount(styleId);
             return true;   // 좋아요 추가
         }
     }
 
     public List<ContentStyleBean> getLikedStyles(int userId, int count, int offset) {
         return contentMapper.getLikedStylesByUser(userId, count, offset);
+    }
+
+    public boolean toggleShortLike(int short_id, int user_id) {
+        if (contentMapper.hasShortLike(short_id, user_id)) {
+            contentMapper.removeShortLike(short_id, user_id);
+            contentMapper.decreaseShortLikeCount(short_id);
+            return false;  // 좋아요 취소
+        } else {
+            contentMapper.addShortLike(short_id, user_id);
+            contentMapper.increaseShortLikeCount(short_id);
+            return true;   // 좋아요 추가
+        }
     }
 }
