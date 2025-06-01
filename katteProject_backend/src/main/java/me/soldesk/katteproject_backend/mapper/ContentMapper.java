@@ -132,4 +132,10 @@ public interface ContentMapper {
 
     @Update("UPDATE content_shortform SET shortform_like_count = shortform_like_count - 1 WHERE id = #{short_id} AND shortform_like_count > 0")
     void decreaseShortLikeCount(int short_id);
+
+    @Select("SELECT COUNT(*) FROM content_style WHERE user_id = #{userId}")
+    int countStyleByUserId(int userId);
+
+    @Select("SELECT COUNT(*) FROM content_stylecomment WHERE user_id = #{userId}")
+    int countStyleCommentByUserId(int userId);
 }
