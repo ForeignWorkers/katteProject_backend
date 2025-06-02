@@ -1,8 +1,8 @@
 package me.soldesk.katteproject_backend.mapper;
 
 
-import me.soldesk.katteproject_backend.test.UserBanBean;
-import me.soldesk.katteproject_backend.test.UserRestrictionBean;
+import common.bean.user.UserBanBean;
+import common.bean.user.UserRestrictionBean;
 import org.apache.ibatis.annotations.*;
 
 @Mapper
@@ -16,7 +16,7 @@ public interface AdminMapper {
 
     //벤 해제
     @Delete("DELETE FROM user_ban WHERE user_id = #{user_id}")
-    void deleteUserBan(@Param("userId") int userId);
+    void deleteUserBan(@Param("user_id") int userId);
 
     //제한 유저 등록
     @Insert("""

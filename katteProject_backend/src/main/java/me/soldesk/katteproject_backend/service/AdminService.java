@@ -2,8 +2,8 @@ package me.soldesk.katteproject_backend.service;
 
 import lombok.RequiredArgsConstructor;
 import me.soldesk.katteproject_backend.mapper.AdminMapper;
-import me.soldesk.katteproject_backend.test.UserBanBean;
-import me.soldesk.katteproject_backend.test.UserRestrictionBean;
+import common.bean.user.UserBanBean;
+import common.bean.user.UserRestrictionBean;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;

@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import me.soldesk.katteproject_backend.service.AdminService;
-import me.soldesk.katteproject_backend.test.UserBanBean;
-import me.soldesk.katteproject_backend.test.UserRestrictionBean;
-import me.soldesk.katteproject_backend.test.UserRestrictionUpdateBean;
+import common.bean.user.UserBanBean;
+import common.bean.user.UserRestrictionBean;
+import common.bean.user.UserRestrictionUpdateBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
