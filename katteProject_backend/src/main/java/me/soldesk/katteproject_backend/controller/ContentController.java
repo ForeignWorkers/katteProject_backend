@@ -113,6 +113,12 @@ public class ContentController {
         return ResponseEntity.ok(contentService.getStyleByUserId(user_id, count, offset));
     }
 
+    @GetMapping("/content/style/user/count")
+    @Operation(summary = "유저가 작성한 스타일 총 개수", description = "유저 ID로 등록된 스타일의 총 개수를 반환")
+    public ResponseEntity<Integer> getStyleCount(@RequestParam int user_id) {
+        return ResponseEntity.ok(contentService.getStyleCountByUserId(user_id));
+    }
+
     @GetMapping("/content/style/comment/user")
     //API Docs
     @Operation(summary = "스타일 댓글을 유저 id로 조회", description = "유저 id로 댓글 조회 (리스트 조회)")
@@ -122,6 +128,12 @@ public class ContentController {
                                                                           @RequestParam(defaultValue = "10") int count,
                                                                           @RequestParam(defaultValue = "0") int offset) {
         return ResponseEntity.ok(contentService.getStyleCommentByUserId(user_id, count, offset));
+    }
+
+    @GetMapping("/content/style/comment/user/count")
+    @Operation(summary = "유저가 작성한 스타일 댓글 총 개수", description = "유저 ID로 등록된 스타일 댓글의 총 개수를 반환")
+    public ResponseEntity<Integer> getStyleCommentCount(@RequestParam int user_id) {
+        return ResponseEntity.ok(contentService.getStyleCommentCountByUserId(user_id));
     }
 
     @PostMapping("/content/style/like")
@@ -156,4 +168,6 @@ public class ContentController {
         boolean liked = contentService.toggleShortLike(short_id, user_id);
         return ResponseEntity.ok(liked);
     }
+
+
 }

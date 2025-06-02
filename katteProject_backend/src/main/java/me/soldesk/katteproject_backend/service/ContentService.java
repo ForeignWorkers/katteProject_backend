@@ -112,4 +112,12 @@ public class ContentService {
             return true;   // 좋아요 추가
         }
     }
+
+    public int getStyleCountByUserId(int userId) {
+        return contentMapper.countStyleByUserId(userId);
+    }
+
+    public int getStyleCommentCountByUserId(int userId) {
+        return contentMapper.countStyleCommentByUserId(userId);
+    }
 }
