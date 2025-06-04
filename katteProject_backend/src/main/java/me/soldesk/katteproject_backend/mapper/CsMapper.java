@@ -22,18 +22,21 @@ public interface CsMapper {
     int addAnnounce(CsAnnounceBean csAnnounceBean);
 
     //공지사항 전체 조회
-    @Select("SELECT * FROM cs_announce order by announce_at desc, announce_id desc;")
+    @Select("SELECT * FROM cs_announce order by announce_at desc, announce_id desc limit #{count} offset #{offset};")
     @Options(useGeneratedKeys = true, keyProperty = "announce_id")
-    List<CsAnnounceBean> getAnnounce();
+    List<CsAnnounceBean> getAnnounce(int count, int offset);
 
     //공지사항 세부 조회
     @Select("SELECT * FROM cs_announce WHERE announce_id = #{announce_id};")
     List<CsAnnounceBean> getAnnounceDetail(int announce_id);
 
-    //카테고리별 공지사항 (접수 / 처리중 / 답변 완료)
-    @Select("SELECT * FROM cs_announce WHERE announce_category = #{announce_category} ORDER BY announce_at DESC, announce_id DESC")
+    //카테고리별 공지사항 조회 (접수 / 처리중 / 답변 완료)
+    @Select("SELECT * FROM cs_announce WHERE announce_category = #{announce_category}" +
+            "ORDER BY announce_at DESC, announce_id DESC limit #{count} offset #{offset}")
     List<CsAnnounceBean> getAnnounceByCategory(
-            @Param("announce_category") CsAnnounceBean.announce_category announce_category);
+            @Param("announce_category") CsAnnounceBean.announce_category announce_category,
+            int count,
+            int offset);
 
     // 공지사항 수정
     @Update("update cs_announce " +
@@ -63,8 +66,8 @@ public interface CsMapper {
     int addFaq(CsFaqBean csFaqBean);
 
     // 모든 자주 묻는 질문 목록을 리스트로 받음
-    @Select("SELECT * FROM cs_support_faq ORDER BY created_at DESC, faq_id DESC")
-    List<CsFaqBean> getAllFaq();
+    @Select("SELECT * FROM cs_support_faq ORDER BY created_at DESC, faq_id DESC limit #{count} offset #{offset}")
+    List<CsFaqBean> getAllFaq(int count, int offset);
 
     // faq_id를 통해 자주 묻는 질문 상세 출력
     @Select("SELECT * FROM cs_support_faq WHERE faq_id = #{faq_id}")
@@ -72,9 +75,12 @@ public interface CsMapper {
             @Param("faq_id") int faq_id);
 
     //자주 묻는 질문 카테고리별 공지사항 (접수 / 처리중 / 답변 완료)
-    @Select("SELECT * FROM cs_support_faq WHERE faq_category = #{faq_category} ORDER BY created_at DESC, faq_id DESC")
+    @Select("SELECT * FROM cs_support_faq WHERE faq_category = #{faq_category}" +
+            "ORDER BY created_at DESC, faq_id DESC limit #{count} offset #{offset}")
     List<CsFaqBean> getFaqByCategory(
-            @Param("faq_category") CsFaqBean.faq_category faq_category);
+            @Param("faq_category") CsFaqBean.faq_category faq_category,
+            int count,
+            int offset);
 
 
     // 자주 묻는 질문 수정
@@ -105,8 +111,9 @@ public interface CsMapper {
     int addCsInquireCustomer(CsInquireCustomerBean csinquirecustomerbean);
 
     // 1:1 문의 내역 전체 조회
-    @Select("select * from cs_inquire_customer where user_id = #{user_id} order by inquire_at desc, inquire_id desc")
-    List<CsInquireCustomerBean> getCsInquireCustomerByUserId(int user_id);
+    @Select("select * from cs_inquire_customer where user_id = #{user_id} order by inquire_at desc, inquire_id desc " +
+            "limit #{count} offset #{offset}")
+    List<CsInquireCustomerBean> getCsInquireCustomerByUserId(int user_id, int count, int offset);
 
     // 1:1 문의 내역 상세 조회
     @Select("select * from cs_inquire_customer where user_id = #{user_id} AND inquire_id = #{inquire_id}")
@@ -116,10 +123,13 @@ public interface CsMapper {
     );
 
     //1:1 문의 리스트 (접수 / 처리중 / 답변 완료)
-    @Select("SELECT * FROM cs_inquire_customer WHERE user_id = #{user_id} and inquire_status = #{inquire_status} ORDER BY inquire_at DESC, inquire_id DESC")
+    @Select("SELECT * FROM cs_inquire_customer WHERE user_id = #{user_id} and inquire_status = #{inquire_status}" +
+            " ORDER BY inquire_at DESC, inquire_id DESC limit #{count} offset #{offset}")
     List<CsInquireCustomerBean> getAllInquiresByStatusCustomer(
             @Param("user_id") int user_id,
-            @Param("inquire_status") CsInquireCustomerBean.inquire_status inquire_status);
+            @Param("inquire_status") CsInquireCustomerBean.inquire_status inquire_status,
+            int count,
+            int offset);
 
     // 1:1 문의 수정
     @Update("update cs_inquire_customer " +
@@ -149,12 +159,17 @@ public interface CsMapper {
     int addCsReply(CsReplyBean csReplyBean);
 
     //1:1 문의 답변 리스트
-    @Select("select * from cs_reply_admin order by reply_at desc, reply_id desc;")
-    List<CsReplyBean> getAllCsReply();
+    @Select("select * from cs_reply_admin order by reply_at desc, reply_id desc limit #{count} offset #{offset};")
+    List<CsReplyBean> getAllCsReply(int count, int offset);
 
-    //1:1 문의 리스트 (접수 / 처리중 / 답변 완료)
-    @Select("SELECT * FROM cs_inquire_customer WHERE inquire_status = #{inquire_status} ORDER BY inquire_at DESC, inquire_id DESC")
-    List<CsInquireCustomerBean> getAllInquiresByStatusAdmin(@Param("inquire_status") CsInquireCustomerBean.inquire_status inquire_status);
+    //1:1 문의 상태에 따른 리스트 (접수 / 처리중 / 답변 완료)
+    @Select("SELECT * FROM cs_inquire_customer WHERE inquire_status = #{inquire_status}" +
+            "ORDER BY inquire_at DESC, inquire_id DESC limit #{count} offset #{offset}")
+    List<CsInquireCustomerBean> getAllInquiresByStatusAdmin(
+            @Param("inquire_status") CsInquireCustomerBean.inquire_status inquire_status,
+            int count,
+            int offset
+    );
 
     //1:1 문의 답변 상세 조회
     @Select("select * from cs_reply_admin where reply_id = #{reply_id} and inquire_id = #{inquire_id} " +

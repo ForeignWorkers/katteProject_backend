@@ -20,23 +20,27 @@ public class CsInquireCustomerService {
 
 
     //문의 조회 ( 문의 내역 목록 / 상세 문의 내역 )
-    public List<CsInquireCustomerBean> getCsInquire(int user_id, Integer inquire_id) { //문의 ID를 받은 경우 상세 문의 내역을 리스트로.
+    public List<CsInquireCustomerBean> getCsInquire(int user_id, Integer inquire_id, Integer count, Integer offset) { //문의 ID를 받은 경우 상세 문의 내역을 리스트로.
         if (inquire_id != null && inquire_id > 0) {
             List<CsInquireCustomerBean> inquireBean = csMapper.getCsInquireCustomerByUserIdAndInquireId(user_id, inquire_id);
             if (inquireBean != null && !inquireBean.isEmpty()) {
                 return inquireBean;
             } else {
-                throw new IllegalArgumentException("문의 내역이 존재하지 않습니다.");
+                throw new IllegalArgumentException("찾으시는 문의 내역이 존재하지 않습니다.");
             }
-        }else { //문의 ID를 받지 않은 경우에는 문의 내역 목록을 리스트로.
-            List<CsInquireCustomerBean> inquireList = csMapper.getCsInquireCustomerByUserId(user_id);
+        }else if(count != null && offset != null){ //문의 ID를 받지 않은 경우에는 문의 내역 목록을 리스트로.
+            List<CsInquireCustomerBean> inquireList = csMapper.getCsInquireCustomerByUserId(user_id, count, offset);
             return inquireList;
+        }else{
+            throw new IllegalArgumentException("문의 내역이 존재하지 않습니다.");
         }
     }
 
     //문의 조회 (처리 상태별로)
-    public List<CsInquireCustomerBean> getCsInquireByCategoryCustomer(int user_id, CsInquireCustomerBean.inquire_status inquire_status){
-        return csMapper.getAllInquiresByStatusCustomer(user_id, inquire_status);
+    public List<CsInquireCustomerBean> getCsInquireByCategoryCustomer(int user_id,
+                                                                      CsInquireCustomerBean.inquire_status inquire_status,
+                                                                      int count, int offset){
+        return csMapper.getAllInquiresByStatusCustomer(user_id, inquire_status, count, offset);
     }
 
 

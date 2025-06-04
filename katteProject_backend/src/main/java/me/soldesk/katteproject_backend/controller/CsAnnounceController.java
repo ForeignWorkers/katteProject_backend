@@ -41,11 +41,12 @@ public class CsAnnounceController {
     @Operation(summary = "공지 조회", description = "공지 조회에 사용. announce_id가 없으면 공지 목록을 반환하고 입력하면 해당하는 공지의 내용이 출력")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     public ResponseEntity<List<CsAnnounceBean>> getAnnounce(
-            @RequestParam(required = false) Integer announce_id)
+            @RequestParam(required = false) Integer announce_id,
+            @RequestParam(defaultValue = "10") int count,
+            @RequestParam(defaultValue = "0") int offset)
     {
         try {
-           csAnnounceService.getAnnounce(announce_id);
-           return ResponseEntity.ok(csAnnounceService.getAnnounce(announce_id));
+           return ResponseEntity.ok(csAnnounceService.getAnnounce(announce_id, count, offset));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -57,13 +58,16 @@ public class CsAnnounceController {
     @Operation(summary = "공지사항을 카테고리별로 로드함", description = "announce_category를 반드시 포함해야하며, category는" +
             "ANNOUNCE, EVENT, ETC가 있음")
     public ResponseEntity<List<CsAnnounceBean>> getAnnounceByCategory(
-            @RequestParam CsAnnounceBean.announce_category announce_category){
+            @RequestParam CsAnnounceBean.announce_category announce_category,
+            @RequestParam(defaultValue = "10") int count,
+            @RequestParam(defaultValue = "0") int offset
+            ){
         try {
-            List<CsAnnounceBean> announceList = csAnnounceService.getAnnounceByCategory(announce_category);
+            List<CsAnnounceBean> announceList = csAnnounceService.getAnnounceByCategory(announce_category, count, offset);
             if(announceList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-            return ResponseEntity.ok(csAnnounceService.getAnnounceByCategory(announce_category));
+            return ResponseEntity.ok(csAnnounceService.getAnnounceByCategory(announce_category, count, offset));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

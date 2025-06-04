@@ -46,11 +46,13 @@ public class CsReplyController {
     @Operation(summary = "문의 답변을 조회함", description = "공백으로 보내면 리스트를, reply_id와 inquire_id를 입력하면 상세 내역을 로드함.")
     public ResponseEntity<List<CsReplyBean>> getCsReply(
             @RequestParam(required = false) Integer reply_id,
-            @RequestParam(required = false) Integer inquire_id
+            @RequestParam(required = false) Integer inquire_id,
+            @RequestParam(defaultValue = "10") int count,
+            @RequestParam(defaultValue = "0") int offset
             ){
         try {
-            csReplyService.getCsReply(reply_id, inquire_id);
-            return ResponseEntity.ok(csReplyService.getCsReply(reply_id, inquire_id));
+                csReplyService.getCsReply(reply_id, inquire_id, count, offset);
+                return ResponseEntity.ok(csReplyService.getCsReply(reply_id, inquire_id, count, offset));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -61,13 +63,16 @@ public class CsReplyController {
     @GetMapping("/cs/reply/status")
     @Operation(summary = "문의를 진행 상황별로 로드함", description = "inquire_status를 포함해야 함.PENDING, ONGOING, COMPLETE가 있음")
     public ResponseEntity<List<CsInquireCustomerBean>> getCsCategory(
-            @RequestParam CsInquireCustomerBean.inquire_status inquire_status){
+            @RequestParam CsInquireCustomerBean.inquire_status inquire_status,
+            @RequestParam(defaultValue = "10") int count,
+            @RequestParam(defaultValue = "0") int offset
+            ){
         try {
-            List<CsInquireCustomerBean> inquireList = csReplyService.getCsInquireByStatusAdmin(inquire_status);
+            List<CsInquireCustomerBean> inquireList = csReplyService.getCsInquireByStatusAdmin(inquire_status, count, offset);
             if(inquireList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-            return ResponseEntity.ok(csReplyService.getCsInquireByStatusAdmin(inquire_status));
+            return ResponseEntity.ok(csReplyService.getCsInquireByStatusAdmin(inquire_status, count, offset));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

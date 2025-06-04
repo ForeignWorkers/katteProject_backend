@@ -21,7 +21,7 @@ public class CsFaqService
     }
 
     //faq 목록 / 상세 조회
-    public List<CsFaqBean> getFaqs(Integer faq_id) {
+    public List<CsFaqBean> getFaqs(Integer faq_id, Integer count, Integer offset) {
         if (faq_id != null && faq_id > 0) {
             List<CsFaqBean> faqBean = csMapper.getFaqDetail(faq_id);
             if(faqBean != null && !faqBean.isEmpty()){
@@ -29,15 +29,18 @@ public class CsFaqService
             }else{
                 throw new NoSuchElementException("자주 묻는 질문을 찾을 수 없습니다.");
             }
-        }else{
-            List<CsFaqBean> faqList = csMapper.getAllFaq();
+        }else if(count != null && offset != null){
+            List<CsFaqBean> faqList = csMapper.getAllFaq(count, offset);
             return faqList;
+        }else{
+            throw new NoSuchElementException("해당하는 자주 묻는 질문을 찾을 수 없습니다.");
         }
     }
 
     //문의 조회 (처리 상태별로)
-    public List<CsFaqBean> getFaqByCategory(CsFaqBean.faq_category faq_category){
-        return csMapper.getFaqByCategory(faq_category);
+    public List<CsFaqBean> getFaqByCategory(CsFaqBean.faq_category faq_category,
+                                            int count, int offset) {
+        return csMapper.getFaqByCategory(faq_category, count, offset);
     }
 
     //faq 수정

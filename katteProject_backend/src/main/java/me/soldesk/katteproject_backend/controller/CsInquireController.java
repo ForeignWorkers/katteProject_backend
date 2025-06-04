@@ -43,11 +43,13 @@ public class CsInquireController {
     @ApiResponse(responseCode = "500", description = "서버 에러")
     public ResponseEntity<List<CsInquireCustomerBean>> getInquiry(
             @RequestParam int user_id,
-            @RequestParam(required = false) Integer inquire_id
+            @RequestParam(required = false) Integer inquire_id,
+            @RequestParam(defaultValue = "10") int count,
+            @RequestParam(defaultValue = "0") int offset
     ) {
         try {
-            csInquireCustomerService.getCsInquire(user_id, inquire_id);
-            return ResponseEntity.ok(csInquireCustomerService.getCsInquire(user_id, inquire_id));
+            csInquireCustomerService.getCsInquire(user_id, inquire_id, count, offset);
+            return ResponseEntity.ok(csInquireCustomerService.getCsInquire(user_id, inquire_id, count, offset));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -58,13 +60,16 @@ public class CsInquireController {
     @GetMapping("/cs/inquiry/category")
     public ResponseEntity<List<CsInquireCustomerBean>> getCsCategory(
             @RequestParam int user_id,
-            @RequestParam CsInquireCustomerBean.inquire_status inquire_status){
+            @RequestParam CsInquireCustomerBean.inquire_status inquire_status,
+            @RequestParam(defaultValue = "10") int count,
+            @RequestParam(defaultValue = "0") int offset
+            ){
         try {
-            List<CsInquireCustomerBean> inquireList = csInquireCustomerService.getCsInquireByCategoryCustomer(user_id, inquire_status);
+            List<CsInquireCustomerBean> inquireList = csInquireCustomerService.getCsInquireByCategoryCustomer(user_id, inquire_status, count, offset);
             if(inquireList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-            return ResponseEntity.ok(csInquireCustomerService.getCsInquireByCategoryCustomer(user_id, inquire_status));
+            return ResponseEntity.ok(csInquireCustomerService.getCsInquireByCategoryCustomer(user_id, inquire_status, count, offset));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

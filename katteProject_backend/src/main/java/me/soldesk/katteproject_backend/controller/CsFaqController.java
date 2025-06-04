@@ -42,11 +42,14 @@ public class CsFaqController {
             "해당하는 자주 묻는 질문의 내용이 출력")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     public ResponseEntity<List<CsFaqBean>> getFaqs(
-            @RequestParam(required = false) Integer faq_id)
+            @RequestParam(required = false) Integer faq_id,
+            @RequestParam(defaultValue = "10") int count,
+            @RequestParam(defaultValue = "0") int offset
+            )
     {
         try {
-           csFaqService.getFaqs(faq_id);
-           return ResponseEntity.ok(csFaqService.getFaqs(faq_id));
+           csFaqService.getFaqs(faq_id, count, offset);
+           return ResponseEntity.ok(csFaqService.getFaqs(faq_id, count, offset));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -57,13 +60,16 @@ public class CsFaqController {
     @Operation(summary = "카테고리별로 자주 묻는 질문 조회", description = "자주 묻는 질문 카테고리별 조회에 사용. faq_category를 필수로 하며 " +
             "해당하는 카테고리로 분류해줌.")
     public ResponseEntity<List<CsFaqBean>> getFaqCategory(
-            @RequestParam CsFaqBean.faq_category faq_category){
+            @RequestParam CsFaqBean.faq_category faq_category,
+            @RequestParam(defaultValue = "10") int count,
+            @RequestParam(defaultValue = "0") int offset
+            ){
         try {
-            List<CsFaqBean> faqList = csFaqService.getFaqByCategory(faq_category);
+            List<CsFaqBean> faqList = csFaqService.getFaqByCategory(faq_category, count, offset);
             if(faqList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-            return ResponseEntity.ok(csFaqService.getFaqByCategory(faq_category));
+            return ResponseEntity.ok(faqList);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
