@@ -18,7 +18,7 @@ public class CsInquireController {
     @Autowired
     CsInquireCustomerService csInquireCustomerService;
 
-    @PostMapping("/cs/inquiry")
+    @PostMapping("/cs/inquiry/post")
     @Operation(summary = "문의 등록", description = "문의를 등록하는 역할을 하며 user_id, inquire_category, inquire_title, inquire_content를 꼭 포함해야 함.")
     @ApiResponse(responseCode = "200", description = "성공")
     public ResponseEntity<String> addInquire(@RequestBody @Valid CsInquireCustomerBean csInquireCustomerBean) {
@@ -37,7 +37,8 @@ public class CsInquireController {
     }
 
     @GetMapping("/cs/inquiry")
-    @Operation(summary = "문의 내역 조회 및 상세 페이지", description = "user_id로 문의 내역을 가져오거나, user_id와 inquire_id로 상세 내역을 가져옴.")
+    @Operation(summary = "문의 내역 조회 및 상세 페이지", description = "user_id로 문의 내역을 가져오거나, " +
+            "user_id와 inquire_id로 상세 내역을 가져옴")
     @ApiResponse(responseCode = "200", description = "성공 - 문의 내역 또는 상세 내역 반환")
     @ApiResponse(responseCode = "500", description = "서버 에러")
     public ResponseEntity<List<CsInquireCustomerBean>> getInquiry(
@@ -53,12 +54,29 @@ public class CsInquireController {
         }
     }
 
+    //1:1 문의 답변 상태별 리스트 조회
+    @GetMapping("/cs/inquiry/category")
+    public ResponseEntity<List<CsInquireCustomerBean>> getCsCategory(
+            @RequestParam int user_id,
+            @RequestParam CsInquireCustomerBean.inquire_status inquire_status){
+        try {
+            List<CsInquireCustomerBean> inquireList = csInquireCustomerService.getCsInquireByCategoryCustomer(user_id, inquire_status);
+            if(inquireList.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            return ResponseEntity.ok(csInquireCustomerService.getCsInquireByCategoryCustomer(user_id, inquire_status));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PatchMapping("cs/inquiry/edit")
-    @Operation(summary = "문의 내역 수정", description = "userId, inquireId, " +
-            " inquireCategory, inquireTitle, inquireContent를 받아서 수정함.")
+    @Operation(summary = "문의 내역 수정", description = "user_id, inquire_id, " +
+            " inquire_category, inquire_title, inquire_content를 받아서 수정함.")
     public ResponseEntity<String> updateInquire(@RequestBody CsInquireCustomerBean csInquireCustomerBean){
         try{
-            csInquireCustomerService.editCsInquireCustomer(csInquireCustomerBean);
+            csInquireCustomerService.updateCsInquireCustomer(csInquireCustomerBean);
             return ResponseEntity.ok("수정되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
