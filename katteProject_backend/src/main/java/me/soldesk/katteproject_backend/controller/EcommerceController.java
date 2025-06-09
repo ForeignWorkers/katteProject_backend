@@ -75,4 +75,13 @@ public class EcommerceController {
     public ResponseEntity<EcommerceCoupon> getCouponData(@RequestParam int coupon_id) {
         return ResponseEntity.ok(ecommerceService.getCouponDataByCouponId(coupon_id));
     }
+
+    @PatchMapping("/settlement")
+    @Operation(summary = "판매금 정산 처리 요청", description = "auction_id로 낙찰 정산 상태를 처리합니다. 상태가 'sold_out'일 경우만 정산이 가능합니다.")
+    @ApiResponse(responseCode = "200", description = "정산 처리 성공")
+    @ApiResponse(responseCode = "400", description = "정산 처리 실패 또는 조건 불충족")
+    public ResponseEntity<String> requestSettlement(@RequestParam("auction_id") int auctionId) {
+        ecommerceService.requestSettlement(auctionId);
+        return ResponseEntity.ok(String.format("auction_id=%d의 낙찰 금액 정산 처리가 완료되었습니다.", auctionId));
+    }
 }
