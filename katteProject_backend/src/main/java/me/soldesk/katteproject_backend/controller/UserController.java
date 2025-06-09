@@ -100,7 +100,7 @@ public class UserController {
         return ResponseEntity.ok(user_id + "유저가 삭제 되었습니다.");
     }
 
-    @GetMapping("/user/login")
+    @PostMapping("/user/login")
     //API Docs
     @Operation(summary = "로그인 가능 여부 확인", description = "바디에 유저 이메일, 비밀번호 넣기")
     public ResponseEntity<Boolean> login(@RequestBody Map<String,String> loginData) {
