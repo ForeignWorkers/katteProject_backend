@@ -7,10 +7,12 @@ import me.soldesk.katteproject_backend.service.AdminService;
 import common.bean.user.UserBanBean;
 import common.bean.user.UserRestrictionBean;
 import common.bean.user.UserRestrictionUpdateBean;
+import common.bean.admin.InspectionProductViewBean;
+import common.bean.admin.UserAdminViewBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -86,4 +88,86 @@ public class AdminController {
         return ResponseEntity.ok(statusMessage);
     }
 
+    @GetMapping("/users")
+    @Operation(summary = "회원 목록 조회", description = "전체 회원 목록 또는 필터 조건에 맞는 회원 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<List<UserAdminViewBean>> getUserList(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String filter
+    ) {
+        return ResponseEntity.ok(adminService.getUserList(offset, size, filter));
+    }
+
+    @GetMapping("/users/count")
+    @Operation(summary = "전체 회원 수 조회", description = "회원 목록의 전체 갯수를 정수로 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<Integer> getUserTotalCount() {
+        return ResponseEntity.ok(adminService.getUserTotalCount());
+    }
+
+    @GetMapping("/users/search")
+    @Operation(summary = "유저 검색", description = "이메일 ID , 닉네임 , 유저 ID로 유저 검색")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<List<UserAdminViewBean>> searchUsers(
+            @RequestParam String keyword
+    ) {
+        return ResponseEntity.ok(adminService.searchUsers(keyword));
+    }
+
+    @GetMapping("/user")
+    @Operation(summary = "단건 유저 조회", description = "user_id로 단건 유저 조회")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public UserAdminViewBean getUserById(@RequestParam("user_id") int userId) {
+        return adminService.findUserById(userId);
+    }
+
+    @PatchMapping("/inspection/complete")
+    @Operation(summary = "검수 완료 처리", description = "검수를 완료하고 상태를 on_sale로 변경")
+    @ApiResponse(responseCode = "200", description = "등록 성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<String> completeInspection(@RequestParam("check_result_id") int checkResultId) {
+        adminService.completeInspection(checkResultId);
+        return ResponseEntity.ok(String.format("검수 결과 ID %d → 완료 처리됨", checkResultId));
+    }
+
+    @PatchMapping("/inspection/fail")
+    @Operation(summary = "검수 실패 처리", description = "검수가 실패되어 상태를 inspection_fail로 변경")
+    @ApiResponse(responseCode = "200", description = "등록 성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<String> failInspection(@RequestParam("check_result_id") int checkResultId) {
+        adminService.failInspection(checkResultId);
+        return ResponseEntity.ok(String.format("검수 결과 ID %d → 반송 처리됨", checkResultId));
+    }
+
+    @GetMapping("/inspection")
+    @Operation(summary = "검수 목록 조회", description = "inspection_product_view에서 페이징된 검수 항목 반환")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<List<InspectionProductViewBean>> getInspectionProductViewList(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(adminService.getInspectionProductViewList(offset, size));
+    }
+
+    @GetMapping("/inspection/count")
+    @Operation(summary = "전체 검수 항목 수 조회", description = "검수 목록의 전체 갯수를 정수로 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<Integer> getInspectionCount() {
+        return ResponseEntity.ok(adminService.getInspectionTotalCount());
+    }
+
+    @DeleteMapping("inspection/delete")
+    @Operation(summary = "검수 실패/만료된 항목 삭제", description = "검수 실패 or 만료 상태이며 3일 경과한 항목을 일괄 삭제합니다.")
+    @ApiResponse(responseCode = "200", description = "삭제 성공")
+    @ApiResponse(responseCode = "400", description = "요청 실패")
+    public ResponseEntity<String> deleteExpiredOrFailedInspections() {
+        int count = adminService.deleteExpiredOrFailedInspections();
+        return ResponseEntity.ok(String.format("총 %d개의 검수/판매 항목이 삭제되었습니다.", count));
+    }
 }
