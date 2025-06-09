@@ -1,12 +1,12 @@
 package me.soldesk.katteproject_backend.service;
 
-import common.bean.product.ProductInfoBean;
-import common.bean.product.ProductSizeBean;
+import common.bean.auction.AuctionDataBean;
+import common.bean.ecommerce.EcommerceOrderBean;
+import common.bean.product.*;
 import me.soldesk.katteproject_backend.mapper.ProductMapper;
-import common.bean.product.ProductCheckResultBean;
-import common.bean.product.ProductPerSaleBean;
 import common.bean.admin.InspectionProductViewBean;
 import common.bean.admin.RegisteredProductViewBean;
+import me.soldesk.katteproject_backend.test.ProductKatteRecommendBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +32,51 @@ public class ProductService {
     // 상품 단건 조회
     public ProductInfoBean getProductById(int productId) {
         return productMapper.getProductById(productId);
+    }
+
+    // 사이즈별 최저 즉시판매가 조회
+    public List<ProductSizeWithPriceBean> getSizeOptionsWithPrices(int product_id) {
+        return productMapper.getSizeOptionsWithPrices(product_id);
+    }
+
+    // 최근 체결 거래 내역 조회
+    public List<EcommerceOrderBean> getRecentTransactionHistory(int product_id, int offset, int size) {
+        return productMapper.getRecentTransactionHistory(product_id, offset, size);
+    }
+
+    // base 및 variant 상품 조회
+    public List<ProductInfoBean> getRelatedBaseAndVariants(int product_base_id, int offset, int size) {
+        return productMapper.getRelatedBaseAndVariants(product_base_id, offset, size);
+    }
+
+    // 해당 상품의 최저가 옥션 조회
+    public AuctionDataBean getCheapestAuctionByProductId(int product_id) {
+        return productMapper.getCheapestAuctionByProductId(product_id);
+    }
+
+    // 숏폼좋아요순 상품 리스트 조회
+    public List<ProductKatteRecommendBean> getKatteRecommendedProducts(int offset, int size) {
+        return productMapper.getKatteRecommendedProductsTop5(offset, size);
+    }
+
+    //브랜드 매출 높은 상품 리스트 조회
+    public List<ProductInfoBean> getTopProductsByBrandOrderCount(String brand_name, int offset, int size) {
+        return productMapper.getTop5ProductsByBrandOrderCount(brand_name, offset, size);
+    }
+
+    // 현재 보고있는 상품과 같이 조회된 상품 리스트 조회
+    public List<ProductInfoBean> getAlsoViewedProducts(int user_id, int current_product_id) {
+        return productMapper.getAlsoViewedProducts(user_id, current_product_id);
+    }
+
+    // 기간별 시세 조회(기간별)
+    public List<ProductPriceHistoryBean> getProductPriceHistory(int productId, String range) {
+        return productMapper.getProductPriceHistory(productId, range);
+    }
+
+    // 기간별 시세 조회(전체)
+    public List<ProductPriceHistoryBean> getProductPriceHistoryAll(int productId) {
+        return productMapper.getProductPriceHistoryAll(productId);
     }
 
     //productSize 등록
