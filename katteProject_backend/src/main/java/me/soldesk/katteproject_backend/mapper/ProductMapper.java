@@ -1,11 +1,11 @@
 package me.soldesk.katteproject_backend.mapper;
 
-import common.bean.product.ProductInfoBean;
-import common.bean.product.ProductSizeBean;
-import common.bean.product.ProductCheckResultBean;
-import common.bean.product.ProductPerSaleBean;
+import common.bean.auction.AuctionDataBean;
+import common.bean.ecommerce.EcommerceOrderBean;
+import common.bean.product.*;
 import common.bean.admin.InspectionProductViewBean;
 import common.bean.admin.RegisteredProductViewBean;
+import me.soldesk.katteproject_backend.test.ProductKatteRecommendBean;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper
 public interface ProductMapper {
 
-    //제품 등록
+    // 상품 정보 등록
     @Insert("""
     INSERT INTO product_info (
         product_id,
@@ -44,7 +44,7 @@ public interface ProductMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insertProduct(ProductInfoBean product);
 
-    //제품 정보 수정
+    // 상품 정보 수정
     @Update("""
     <script>
     UPDATE product_info
@@ -79,9 +79,143 @@ public interface ProductMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insertProductSize(ProductSizeBean sizeBean);
 
-    // 상품 1개 상세 조회
+    // 단일 상품 조회: 상품 ID를 기준으로 product_info 테이블에서 상품 정보
     @Select("SELECT * FROM product_info WHERE product_id = #{product_id}")
     ProductInfoBean getProductById(@Param("product_id") int product_id);
+
+    // 상품 사이즈별 최저가 조회
+    @Select("""
+    SELECT
+    ps.size_value AS auction_size_value,
+    MIN(ad.instant_price) AS price
+    FROM
+    product_size ps
+    LEFT JOIN
+    auction_data ad
+    ON
+    ps.id = ad.product_size_id
+    AND ad.is_instant_sale = true
+    WHERE
+    ps.product_id = #{product_id}
+    GROUP BY
+    ps.size_value
+    ORDER BY
+    ps.size_value
+""")
+    List<ProductSizeWithPriceBean> getSizeOptionsWithPrices(@Param("product_id") int product_id);
+
+    // 최근 체결된 거래(오더) 10건 조회
+    @Select("SELECT * FROM ecommerce_order WHERE product_id = #{product_id} ORDER BY ordered_at DESC LIMIT 10")
+    List<EcommerceOrderBean> getRecentTransactionHistory(@Param("product_id") int product_id);
+
+    // 해당 상품의 즉시가 중 가장 싼 가격(최저가) 1건 조회
+    @Select("""
+        SELECT * FROM auction_data
+        WHERE product_id = #{product_id}
+        ORDER BY instant_price ASC
+        LIMIT 1
+    """)
+    AuctionDataBean getCheapestAuctionByProductId(@Param("product_id") int product_id);
+
+    // base 상품 및 그 파생 상품 전체 조회
+    @Select("SELECT * FROM product_info WHERE product_base_id = #{product_base_id} OR product_id = #{product_base_id}")
+    List<ProductInfoBean> getRelatedBaseAndVariants(@Param("product_base_id") int product_base_id);
+
+    // 기간별 조회 (1개월, 3개월, 6개월, 1년 등)
+    @Select("""
+        SELECT 
+            DATE(ordered_at) AS date,
+            ROUND(AVG(origin_price)) AS price
+        FROM 
+            ecommerce_order
+        WHERE 
+            product_id = #{product_id}
+            AND ordered_at >= DATE_SUB(CURDATE(), INTERVAL ${range})
+        GROUP BY 
+            DATE(ordered_at)
+        ORDER BY 
+            DATE(ordered_at) ASC
+        """)
+    List<ProductPriceHistoryBean> getProductPriceHistory(
+            @Param("product_id") int productId,
+            @Param("range") String range
+    );
+
+    // [신규] 전체 기간 조회용 쿼리
+    @Select("""
+        SELECT 
+            DATE(ordered_at) AS date,
+            ROUND(AVG(origin_price)) AS price
+        FROM 
+            ecommerce_order
+        WHERE 
+            product_id = #{product_id}
+        GROUP BY 
+            DATE(ordered_at)
+        ORDER BY 
+            DATE(ordered_at) ASC
+        """)
+    List<ProductPriceHistoryBean> getProductPriceHistoryAll(
+            @Param("product_id") int productId
+    );
+
+    // 숏폼 좋아요높은순 리스트
+    @Select("""
+    SELECT 
+        pi.product_id,
+        pi.product_name,
+        pi.brand_name,
+        cs.shortform_content_url,
+        cs.like_count
+    FROM 
+        content_shortform cs
+    JOIN 
+        product_info pi ON cs.product_id = pi.product_id
+    WHERE 
+        cs.trade_status IN ('trading', 'bidding')  -- ✅ 거래 또는 입찰 가능
+    ORDER BY 
+        cs.like_count DESC
+    LIMIT 5
+""")
+    List<ProductKatteRecommendBean> getKatteRecommendedProductsTop5();
+
+    // 브랜드 매출 높은 데이터 순
+    @Select("""
+    SELECT 
+        pi.*,
+        COUNT(eo.id) AS order_count
+    FROM 
+        product_info pi
+    JOIN 
+        ecommerce_order eo ON pi.product_id = eo.product_id
+    WHERE 
+        pi.brand_name = #{brand_name}
+    GROUP BY 
+        pi.product_id
+    ORDER BY 
+        order_count DESC
+    LIMIT 5
+""")
+    List<ProductInfoBean> getTop5ProductsByBrandOrderCount(
+            @Param("brand_name") String brand_name
+    );
+
+    // 현재 보고있는 페이지의 상품과 함께 조회됐던 상품들(전부. 무한 스크롤)
+    @Select("""
+    SELECT pi.*
+    FROM product_info pi
+    WHERE pi.product_id IN (
+        SELECT DISTINCT upvh.product_id
+        FROM user_product_view_history upvh
+        WHERE upvh.user_id = #{user_id}
+          AND upvh.product_id != #{current_product_id}
+    )
+    ORDER BY pi.product_id DESC
+""")
+    List<ProductInfoBean> getAlsoViewedProducts(
+            @Param("user_id") int user_id,
+            @Param("current_product_id") int current_product_id
+    );
 
     //브랜드 추가
     @Insert("INSERT INTO product_brand (brand_name) VALUES (#{brandName})")
@@ -108,7 +242,7 @@ public interface ProductMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insertPerSale(ProductPerSaleBean perSaleBean);
 
-    //검수 요청
+    //검수 요청 등록
     @Insert("""
     INSERT INTO product_check_result (
         per_sale_id,
@@ -130,7 +264,7 @@ public interface ProductMapper {
     """)
     void insertCheckResult(ProductCheckResultBean checkResultBean);
 
-    //검수 요청으로 인한 상태 업데이트
+    //검수 요청으로 인한 판매상태 업데이트
     @Update("""
         UPDATE product_per_sale
         SET sale_step = #{sale_step}
@@ -148,13 +282,15 @@ public interface ProductMapper {
     """)
     void markAsSoldOut(@Param("check_result_id") int checkResultId);
 
-    //brand like
+    //브랜드 좋아요 여부 확인
     @Select("SELECT COUNT(*) FROM product_brand_like WHERE brand_id = #{brand_id} AND user_id = #{user_id}")
     boolean hasBrandLike(int brand_id, int user_id);
 
+    //브랜드 좋아요 추가
     @Insert("INSERT INTO product_brand_like(brand_id, user_id, created_at) VALUES(#{brand_id}, #{user_id}, NOW())")
     void addBrandLike(int brand_id, int user_id);
 
+    //브랜드 좋아요 삭제
     @Delete("DELETE FROM product_brand_like WHERE brand_id = #{brand_id} AND user_id = #{user_id}")
     void removeBrandLike(int brand_id, int user_id);
 
@@ -180,7 +316,7 @@ public interface ProductMapper {
     @Update("UPDATE product_info SET product_like_count = product_like_count - 1 WHERE product_id = #{product_id} AND product_like_count > 0")
     void decreaseProductLikeCount(int product_id);
 
-    //상품 사이즈 동기화 쿼리
+    //상품 사이즈 사이즈 값 조회(동기화 쿼리)
     @Select("SELECT size_value FROM product_size WHERE id = #{id}")
     String getSizeValueById(int id);
 

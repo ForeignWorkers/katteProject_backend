@@ -1,15 +1,15 @@
 package me.soldesk.katteproject_backend.controller;
 
-import common.bean.product.ProductInfoBean;
-import common.bean.product.ProductSizeBean;
+import common.bean.auction.AuctionDataBean;
+import common.bean.ecommerce.EcommerceOrderBean;
+import common.bean.product.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import me.soldesk.katteproject_backend.service.ProductService;
-import common.bean.product.ProductCheckResultBean;
-import common.bean.product.ProductPerSaleBean;
 import common.bean.admin.InspectionProductViewBean;
 import common.bean.admin.RegisteredProductViewBean;
+import me.soldesk.katteproject_backend.test.ProductKatteRecommendBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -65,6 +65,82 @@ public class ProductController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/product/size-options/prices")
+    @Operation(summary = "사이즈별 최저 즉시판매가 조회", description = "상품 ID에 대해 각 사이즈별 최저 즉시판매가를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음")
+    public ResponseEntity<List<ProductSizeWithPriceBean>> getSizeOptionsWithPrices(@RequestParam int product_id) {
+        List<ProductSizeWithPriceBean> result = productService.getSizeOptionsWithPrices(product_id);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/product/recent-transactions")
+    @Operation(summary = "최근 거래 내역", description = "최근 체결된 거래 내역을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음")
+    public ResponseEntity<List<EcommerceOrderBean>> getRecentOrders(@RequestParam int product_id) {
+        return ResponseEntity.ok(productService.getRecentTransactionHistory(product_id));
+    }
+
+    @GetMapping("/product/cheapest-auction")
+    @Operation(summary = "최저가 옥션 조회", description = "상품의 현재 최저가 옥션 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음")
+    public ResponseEntity<AuctionDataBean> getCheapestAuction(@RequestParam int product_id) {
+        return ResponseEntity.ok(productService.getCheapestAuctionByProductId(product_id));
+    } // >> 이 상품을 가장 싸게 팔고있는 판매자 확인하기 위함임.
+
+    @GetMapping("/product/related")
+    @Operation(summary = "베이스/파생 상품 조회", description = "base 상품과 variant 상품을 함께 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음")
+    public ResponseEntity<List<ProductInfoBean>> getRelated(@RequestParam int product_base_id) {
+        return ResponseEntity.ok(productService.getRelatedBaseAndVariants(product_base_id));
+    }
+
+    @GetMapping("/product/price-history")
+    @Operation(summary = "기간별 시세 조회", description = "origin_price 기반으로 기간 내 일별 평균 시세를 반환합니다.")
+    public ResponseEntity<List<ProductPriceHistoryBean>> getProductPriceHistory(
+            @RequestParam("product_id") int product_id,
+            @RequestParam(value = "range", defaultValue = "1 MONTH") String range) {
+
+        // range가 "ALL"인 경우에는 전체 기간 조회
+        if ("ALL".equalsIgnoreCase(range.trim())) {
+            List<ProductPriceHistoryBean> allHistory = productService.getProductPriceHistoryAll(product_id);
+            return ResponseEntity.ok(allHistory);
+        }
+
+        // 그 외에는 지정된 INTERVAL 범위만큼 조회
+        List<ProductPriceHistoryBean> history = productService.getProductPriceHistory(product_id, range);
+        return ResponseEntity.ok(history);
+    }
+
+    @GetMapping("/product/recommend/katte-top5")
+    @Operation(summary = "캇테 추천 상품 TOP5 리스트", description = "숏폼 콘텐츠 기준 좋아요 수가 높은 TOP5 상품 리스트를 반환합니다.")
+    public ResponseEntity<List<ProductKatteRecommendBean>> getKatteRecommendedProductsTop5() {
+        List<ProductKatteRecommendBean> result = productService.getKatteRecommendedProductsTop5();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/product/brand/top5")
+    @Operation(summary = "브랜드별 매출 상위 TOP5 리스트", description = "특정 브랜드에서 가장 많이 주문된 상품 TOP5를 조회합니다.")
+    public ResponseEntity<List<ProductInfoBean>> getTop5ProductsByBrandOrderCount(
+            @RequestParam String brand_name
+    ) {
+        List<ProductInfoBean> result = productService.getTop5ProductsByBrandOrderCount(brand_name);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/product/also-viewed")
+    @Operation(summary = "같이 본 상품 리스트 조회", description = "현재 보고 있는 상품을 조회한 유저들이 함께 본 다른 상품들을 반환합니다.")
+    public ResponseEntity<List<ProductInfoBean>> getAlsoViewedProducts(
+            @RequestParam int user_id,
+            @RequestParam int current_product_id
+    ) {
+        List<ProductInfoBean> result = productService.getAlsoViewedProducts(user_id, current_product_id);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/product/size")
