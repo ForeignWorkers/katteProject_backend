@@ -67,7 +67,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/product/size-options/prices")
+    @GetMapping("/product/size_options/prices")
     @Operation(summary = "사이즈별 최저 즉시판매가 조회", description = "상품 ID에 대해 각 사이즈별 최저 즉시판매가를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음")
@@ -76,7 +76,7 @@ public class ProductController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/product/recent-transactions")
+    @GetMapping("/product/recent_transactions")
     @Operation(summary = "최근 거래 내역", description = "최근 체결된 거래 내역을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음")
@@ -84,7 +84,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getRecentTransactionHistory(product_id));
     }
 
-    @GetMapping("/product/cheapest-auction")
+    @GetMapping("/product/cheapest_auction")
     @Operation(summary = "최저가 옥션 조회", description = "상품의 현재 최저가 옥션 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음")
@@ -100,7 +100,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getRelatedBaseAndVariants(product_base_id));
     }
 
-    @GetMapping("/product/price-history")
+    @GetMapping("/product/price_history")
     @Operation(summary = "기간별 시세 조회", description = "origin_price 기반으로 기간 내 일별 평균 시세를 반환합니다.")
     public ResponseEntity<List<ProductPriceHistoryBean>> getProductPriceHistory(
             @RequestParam("product_id") int product_id,
@@ -117,7 +117,7 @@ public class ProductController {
         return ResponseEntity.ok(history);
     }
 
-    @GetMapping("/product/recommend/katte-top5")
+    @GetMapping("/product/recommend/katte_top5")
     @Operation(summary = "캇테 추천 상품 TOP5 리스트", description = "숏폼 콘텐츠 기준 좋아요 수가 높은 TOP5 상품 리스트를 반환합니다.")
     public ResponseEntity<List<ProductKatteRecommendBean>> getKatteRecommendedProductsTop5() {
         List<ProductKatteRecommendBean> result = productService.getKatteRecommendedProductsTop5();
@@ -133,7 +133,7 @@ public class ProductController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/product/also-viewed")
+    @GetMapping("/product/also_viewed")
     @Operation(summary = "같이 본 상품 리스트 조회", description = "현재 보고 있는 상품을 조회한 유저들이 함께 본 다른 상품들을 반환합니다.")
     public ResponseEntity<List<ProductInfoBean>> getAlsoViewedProducts(
             @RequestParam int user_id,
