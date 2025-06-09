@@ -104,9 +104,13 @@ public interface ProductMapper {
 """)
     List<ProductSizeWithPriceBean> getSizeOptionsWithPrices(@Param("product_id") int product_id);
 
-    // 최근 체결된 거래(오더) 10건 조회
-    @Select("SELECT * FROM ecommerce_order WHERE product_id = #{product_id} ORDER BY ordered_at DESC LIMIT 10")
-    List<EcommerceOrderBean> getRecentTransactionHistory(@Param("product_id") int product_id);
+    // 최근 체결된 거래(오더) n(ex. 10)건 조회
+    @Select("SELECT * FROM ecommerce_order WHERE product_id = #{product_id} ORDER BY ordered_at DESC " +
+            "LIMIT #{size} OFFSET #{offset}")
+    List<EcommerceOrderBean> getRecentTransactionHistory(
+            @Param("product_id") int product_id,
+            @Param("offset") int offset,
+            @Param("size") int size);
 
     // 해당 상품의 즉시가 중 가장 싼 가격(최저가) 1건 조회
     @Select("""
@@ -117,9 +121,13 @@ public interface ProductMapper {
     """)
     AuctionDataBean getCheapestAuctionByProductId(@Param("product_id") int product_id);
 
-    // base 상품 및 그 파생 상품 전체 조회
-    @Select("SELECT * FROM product_info WHERE product_base_id = #{product_base_id} OR product_id = #{product_base_id}")
-    List<ProductInfoBean> getRelatedBaseAndVariants(@Param("product_base_id") int product_base_id);
+    // base 상품 및 그 파생 상품 조회
+    @Select("SELECT * FROM product_info WHERE product_base_id = #{product_base_id} OR product_id = #{product_base_id} " +
+            "LIMIT #{size} OFFSET #{offset}")
+    List<ProductInfoBean> getRelatedBaseAndVariants(
+            @Param("product_base_id") int product_base_id,
+            @Param("offset") int offset,
+            @Param("size") int size);
 
     // 기간별 조회 (1개월, 3개월, 6개월, 1년 등)
     @Select("""
@@ -175,11 +183,13 @@ public interface ProductMapper {
         cs.trade_status IN ('trading', 'bidding')  -- ✅ 거래 또는 입찰 가능
     ORDER BY 
         cs.like_count DESC
-    LIMIT 5
+    LIMIT #{size} OFFSET #{offset}
 """)
-    List<ProductKatteRecommendBean> getKatteRecommendedProductsTop5();
+    List<ProductKatteRecommendBean> getKatteRecommendedProductsTop5(
+            @Param("offset") int offset,
+            @Param("size") int size);
 
-    // 브랜드 매출 높은 데이터 순
+    // 브랜드 매출 높은순 리스트
     @Select("""
     SELECT 
         pi.*,
@@ -194,10 +204,12 @@ public interface ProductMapper {
         pi.product_id
     ORDER BY 
         order_count DESC
-    LIMIT 5
+    LIMIT #{size} OFFSET #{offset}
 """)
     List<ProductInfoBean> getTop5ProductsByBrandOrderCount(
-            @Param("brand_name") String brand_name
+            @Param("brand_name") String brand_name,
+            @Param("offset") int offset,
+            @Param("size") int size
     );
 
     // 현재 보고있는 페이지의 상품과 함께 조회됐던 상품들(전부. 무한 스크롤)

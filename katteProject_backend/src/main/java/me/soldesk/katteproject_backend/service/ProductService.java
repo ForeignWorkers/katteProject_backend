@@ -40,13 +40,13 @@ public class ProductService {
     }
 
     // 최근 체결 거래 내역 조회
-    public List<EcommerceOrderBean> getRecentTransactionHistory(int product_id) {
-        return productMapper.getRecentTransactionHistory(product_id);
+    public List<EcommerceOrderBean> getRecentTransactionHistory(int product_id, int offset, int size) {
+        return productMapper.getRecentTransactionHistory(product_id, offset, size);
     }
 
     // base 및 variant 상품 조회
-    public List<ProductInfoBean> getRelatedBaseAndVariants(int product_base_id) {
-        return productMapper.getRelatedBaseAndVariants(product_base_id);
+    public List<ProductInfoBean> getRelatedBaseAndVariants(int product_base_id, int offset, int size) {
+        return productMapper.getRelatedBaseAndVariants(product_base_id, offset, size);
     }
 
     // 해당 상품의 최저가 옥션 조회
@@ -55,13 +55,13 @@ public class ProductService {
     }
 
     // 숏폼좋아요순 상품 리스트 조회
-    public List<ProductKatteRecommendBean> getKatteRecommendedProductsTop5() {
-        return productMapper.getKatteRecommendedProductsTop5();
+    public List<ProductKatteRecommendBean> getKatteRecommendedProducts(int offset, int size) {
+        return productMapper.getKatteRecommendedProductsTop5(offset, size);
     }
 
     //브랜드 매출 높은 상품 리스트 조회
-    public List<ProductInfoBean> getTop5ProductsByBrandOrderCount(String brand_name) {
-        return productMapper.getTop5ProductsByBrandOrderCount(brand_name);
+    public List<ProductInfoBean> getTopProductsByBrandOrderCount(String brand_name, int offset, int size) {
+        return productMapper.getTop5ProductsByBrandOrderCount(brand_name, offset, size);
     }
 
     // 현재 보고있는 상품과 같이 조회된 상품 리스트 조회
