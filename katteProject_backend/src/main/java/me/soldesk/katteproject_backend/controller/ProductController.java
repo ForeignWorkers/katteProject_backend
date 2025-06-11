@@ -12,7 +12,7 @@ import common.bean.admin.RegisteredProductViewBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*; 
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -56,7 +56,7 @@ public class ProductController {
     @GetMapping ("/product")
     //API Docs
     @Operation(summary = "상품 조회", description = "상품을 product_id를 이용해 조회")
-    public ResponseEntity<common.bean.product.ProductInfoBean> getProductById(@RequestParam("product_id") int productId) {
+    public ResponseEntity<ProductInfoBean> getProductById(@RequestParam("product_id") int productId) {
         ProductInfoBean product = productService.getProductById(productId);
 
         if (product != null) {
