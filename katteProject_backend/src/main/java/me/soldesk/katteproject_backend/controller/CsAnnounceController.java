@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class CsAnnounceController {
@@ -51,6 +53,12 @@ public class CsAnnounceController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/cs/count")
+    public Map<String, Integer>getAnnounceCount(){
+        int count = csAnnounceService.getAnnounceCount();
+        return Collections.singletonMap("count", count);
     }
 
     //1:1 문의 답변 상태별 리스트 조회
