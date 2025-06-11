@@ -132,4 +132,16 @@ public class UserService {
     public void updateKatteMoneyRefund(UserKatteMoneyRefundBean.status status, int refund_id) {
         userMapper.updateKatteMoneyRefund(status, refund_id);
     }
+
+    public void addUserTerm(int user_id, int term_code, boolean is_agreed) {
+        userMapper.addUserTerm(user_id, term_code, is_agreed);
+    }
+
+    public Boolean getUserByNickname(String nickname) {
+        return userMapper.getUserByNickname(nickname) != null;
+    }
+
+    public Boolean getUserByEmail(String email_id) {
+        return userMapper.getUserByEmail(email_id) != null;
+    }
 }

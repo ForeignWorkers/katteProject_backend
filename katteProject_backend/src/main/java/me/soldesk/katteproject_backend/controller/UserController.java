@@ -180,4 +180,24 @@ public class UserController {
         userService.updateKatteMoneyRefund(status, refund_id);
         return ResponseEntity.ok(String.format("%d의 환불서의 상태가 %s로 업데이트 되었습니다.", refund_id, status));
     }
+
+    @PostMapping("/user/terms")
+    public ResponseEntity<String> addUserTerms(@RequestBody Map<String,String> termData) {
+        String user_id = termData.get("user_id");
+        int term_code = Integer.valueOf(termData.get("term_code"));
+        boolean is_agreed = Boolean.parseBoolean(termData.get("is_agreed"));
+
+        userService.addUserTerm(Integer.parseInt(user_id),term_code,is_agreed);
+        return ResponseEntity.ok("유저의 약관 동의 완료");
+    }
+
+    @GetMapping("/user/nickname")
+    public ResponseEntity<Boolean> isExistUserNickname(@RequestParam String nickname) {
+        return ResponseEntity.ok(userService.getUserByNickname(nickname));
+    }
+
+    @GetMapping("/user/duplicate")
+    public ResponseEntity<Boolean> isExistUserEmail(@RequestParam String email_id) {
+        return ResponseEntity.ok(userService.getUserByEmail(email_id));
+    }
 }

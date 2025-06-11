@@ -130,4 +130,29 @@ public interface UserMapper {
 
     @Update("UPDATE user_katte_money_refund SET status = #{status} WHERE id = #{refund_id}")
     void updateKatteMoneyRefund(UserKatteMoneyRefundBean.status status, int refund_id);
+
+    @Insert("""
+        INSERT INTO user_agreeterms (
+        user_id,
+        terms_code,
+        is_agreed,
+        agreed_at
+        ) VALUES (
+        #{user_id},                              -- user_id (user_info 테이블에 존재하는 유저 ID)
+        #{terms_code},                       -- name
+        #{is_agreed},               -- phone_number
+        NOW()
+        );
+            """)
+    void addUserTerm(int user_id, int terms_code, boolean is_agreed);
+
+    @Select("""
+            SELECT * FROM user_info WHERE nickname = #{nickname}
+            """)
+    UserBean getUserByNickname(String nickname);
+
+    @Select("""
+            SELECT * FROM user_info WHERE email_id = #{email_id}
+            """)
+    UserBean getUserByEmail(String email_id);
 }

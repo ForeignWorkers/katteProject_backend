@@ -92,7 +92,7 @@ public class ProductService {
         }
 
         //허용된 카테고리인지 검사
-        String category = product.getCategory().name(); // enum to string
+        String category = product.getCategory(); // enum to string
         if (!ALLOWED_CATEGORIES.contains(category)) {
             throw new IllegalArgumentException("해당 카테고리는 사이즈 등록이 허용되지 않습니다.");
         }
