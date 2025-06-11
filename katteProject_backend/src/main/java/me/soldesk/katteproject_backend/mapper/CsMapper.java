@@ -21,6 +21,11 @@ public interface CsMapper {
     @Options(useGeneratedKeys = true, keyProperty = "announce_id")
     int addAnnounce(CsAnnounceBean csAnnounceBean);
 
+
+    //공지사항의 전체 갯수 취득
+    @Select("SELECT COUNT(*) FROM cs_announce")
+    int getAnnounceCount();
+
     //공지사항 전체 조회
     @Select("SELECT * FROM cs_announce order by announce_at desc, announce_id desc limit #{count} offset #{offset};")
     @Options(useGeneratedKeys = true, keyProperty = "announce_id")

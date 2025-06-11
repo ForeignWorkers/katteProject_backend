@@ -19,6 +19,11 @@ public class CsAnnounceService {
         return csMapper.addAnnounce(csAnnounceBean);
     }
 
+    //공지사항 갯수 조회
+    public int getAnnounceCount() {
+        return csMapper.getAnnounceCount();
+    }
+
     //공지 사항 조회 (목록 / 세부)
     public List<CsAnnounceBean> getAnnounce(Integer announce_id, Integer count, Integer offset) { //공지 ID를 받은 경우 공지 내역 상세를 리스트로.
         if (announce_id != null && announce_id > 0) {
