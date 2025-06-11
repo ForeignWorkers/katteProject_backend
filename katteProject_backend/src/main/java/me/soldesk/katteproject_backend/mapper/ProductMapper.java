@@ -5,7 +5,6 @@ import common.bean.ecommerce.EcommerceOrderBean;
 import common.bean.product.*;
 import common.bean.admin.InspectionProductViewBean;
 import common.bean.admin.RegisteredProductViewBean;
-import me.soldesk.katteproject_backend.test.ProductKatteRecommendBean;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
