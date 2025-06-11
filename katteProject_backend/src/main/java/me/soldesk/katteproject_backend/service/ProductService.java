@@ -6,7 +6,6 @@ import common.bean.product.*;
 import me.soldesk.katteproject_backend.mapper.ProductMapper;
 import common.bean.admin.InspectionProductViewBean;
 import common.bean.admin.RegisteredProductViewBean;
-import me.soldesk.katteproject_backend.test.ProductKatteRecommendBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -9,11 +9,10 @@ import jakarta.validation.Valid;
 import me.soldesk.katteproject_backend.service.ProductService;
 import common.bean.admin.InspectionProductViewBean;
 import common.bean.admin.RegisteredProductViewBean;
-import me.soldesk.katteproject_backend.test.ProductKatteRecommendBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.*; 
 
 import java.util.List;
 
