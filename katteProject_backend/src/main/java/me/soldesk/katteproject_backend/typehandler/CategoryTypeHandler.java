@@ -17,7 +17,7 @@ public class CategoryTypeHandler extends BaseTypeHandler<ProductInfoBean.Categor
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, ProductInfoBean.Category parameter, JdbcType jdbcType) throws SQLException {
-        ps.setString(i, parameter.name()); // 또는 .getDbValue() → DB에 영문 저장 시
+        ps.setString(i, parameter.getDbValue());
     }
 
     @Override
