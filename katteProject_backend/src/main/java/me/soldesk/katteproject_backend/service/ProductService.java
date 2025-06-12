@@ -20,6 +20,11 @@ public class ProductService {
 
     //product 등록
     public void registerProduct(ProductInfoBean product) {
+        // 브랜드 자동 등록
+        if (product.getBrand_name() != null && !productMapper.isBrandExists(product.getBrand_name())) {
+            productMapper.insertBrand(product.getBrand_name());
+        }
+
         productMapper.insertProduct(product);
     }
 
@@ -55,7 +60,7 @@ public class ProductService {
 
     // 숏폼좋아요순 상품 리스트 조회
     public List<ProductKatteRecommendBean> getKatteRecommendedProducts(int offset, int size) {
-        return productMapper.getKatteRecommendedProductsTop5(offset, size);
+        return productMapper.getKatteRecommendedProducts(offset, size);
     }
 
     //브랜드 매출 높은 상품 리스트 조회
@@ -125,6 +130,7 @@ public class ProductService {
             default:
                 return sizeValue.equalsIgnoreCase("allsize");
         }
+
     }
 
     //판매 상품 등록

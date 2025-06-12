@@ -1,12 +1,7 @@
 package me.soldesk.katteproject_backend.service;
 
-import common.bean.ecommerce.EcommerceCoupon;
-import common.bean.ecommerce.EcommerceCouponHistory;
-import common.bean.user.UserKatteMoneyLogBean;
+import common.bean.ecommerce.*;
 import me.soldesk.katteproject_backend.mapper.EcommerceMapper;
-import me.soldesk.katteproject_backend.mapper.UserMapper;
-import common.bean.ecommerce.EcommerceOrderBean;
-import common.bean.ecommerce.EcommerceSettlementLogBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,98 +12,103 @@ import java.util.List;
 
 @Service
 public class EcommerceService {
+
     @Autowired
     private EcommerceMapper ecommerceMapper;
-    @Autowired
-    private UserMapper userMapper;
 
-    //고정 수수료
     private static final float FEE_RATE = 0.1f;
 
-    //주문 생성
+    // 주문 생성
     public int createAuctionOrder(EcommerceOrderBean request) {
-        EcommerceOrderBean order = new EcommerceOrderBean();
-        order.setUser_id(request.getUser_id());
-        order.setProduct_id(request.getProduct_id());
-        order.setOrigin_price(request.getOrigin_price());
-        order.setAddress_key(request.getAddress_key());
-        order.setUsed_katte_id(request.getUsed_katte_id());
-        order.setAuction_id(request.getAuction_id());
-        order.setOrder_status(EcommerceOrderBean.OrderStatus.PENDING); // 초기 상태
-        order.setOrdered_at(new Date());
-
-        ecommerceMapper.insertOrder(order);
-        return order.getOrder_id(); // @Options로 자동 생성된 ID 반환
+        request.setOrdered_at(new Date());
+        request.setOrder_status(EcommerceOrderBean.OrderStatus.PAYMENT_COMPLETE);
+        ecommerceMapper.insertOrder(request);
+        return request.getOrder_id();
     }
 
-    public void addCouponData(EcommerceCoupon coupon) {
+    // 결제 실행
+    @Transactional
+    public int executePayment(int orderId, int userId, int amount) {
+        Integer balance = ecommerceMapper.getBalanceByUserId(userId);
+        if (balance == null || balance < amount) {
+            throw new IllegalStateException("예수금 부족");
+        }
+
+        // 예수금 차감
+        ecommerceMapper.updateBalance(userId, balance - amount);
+
+        // 결제 로그 등록
+        EcommercePaymentBean payment = new EcommercePaymentBean();
+        payment.setOrder_id(orderId);
+        payment.setUser_id(userId);
+        payment.setAmount(amount);
+        payment.setStatus(EcommercePaymentBean.PaymentStatus.PAID);
+        ecommerceMapper.insertPayment(payment);
+
+        // 예수금 로그 등록
+        ecommerceMapper.insertMoneyLog(userId, -amount, "order_use");
+
+        return payment.getPayment_id();
+    }
+
+    // 구매확정
+    @Transactional
+    public boolean confirmOrder(int orderId, int userId) {
+        String orderStatus = ecommerceMapper.getOrderStatus(orderId, userId);
+        if (!"delivered".equals(orderStatus)) return false;
+
+        boolean alreadyConfirmed = ecommerceMapper.isAlreadyBuyComplete(orderId);
+        if (alreadyConfirmed) return false;
+
+        ecommerceMapper.insertBuyComplete(userId, orderId);
+        return true;
+    }
+
+    // 쿠폰 등록
+    public void registerCoupon(EcommerceCoupon coupon) {
         ecommerceMapper.addCoupon(coupon);
     }
 
-    public void deleteCouponData(int coupon_id) {
-        ecommerceMapper.deleteCouponHistory(coupon_id);
-        ecommerceMapper.deleteCoupon(coupon_id);
+    // 쿠폰 이력 추가
+    public void assignCouponToUser(EcommerceCouponHistory history) {
+        ecommerceMapper.addCouponHistory(history);
     }
 
-    public void addCouponHistoryUser(EcommerceCouponHistory couponHistory) {
-        ecommerceMapper.addCouponHistory(couponHistory);
+    // 쿠폰 사용 처리
+    public void markCouponAsUsed(int userId, int couponId) {
+        ecommerceMapper.updateCouponHistory(LocalDateTime.now(), userId, couponId);
     }
 
-    public void updateCouponHistoryUse(LocalDateTime coupon_use_date, int user_id, int coupon_id) {
-        ecommerceMapper.updateCouponHistory(coupon_use_date, user_id, coupon_id);
-    }
-
-    public List<EcommerceCouponHistory> getCouponHistoryByUserId(int user_id) {
-        return ecommerceMapper.getAllCouponHistory(user_id);
-    }
-
-    public EcommerceCoupon getCouponDataByCouponId(int coupon_id) {
-        return ecommerceMapper.getCoupon(coupon_id);
-    }
-
-    //판매금 정산
+    // 정산 처리
     @Transactional
-    public void requestSettlement(int auctionId) {
-
-        //판매 상태가 'sold_out'인지 확인
-        String saleStep = ecommerceMapper.getSaleStepByAuctionId(auctionId);
-        if (!"sold_out".equals(saleStep)) {
-            throw new IllegalStateException("판매 완료 상태(sold_out)에서만 정산이 가능합니다.");
-        }
-
-        //이미 정산된 건인지 확인
+    public void settleOrder(int auctionId) {
         Boolean alreadySettled = ecommerceMapper.isAlreadySettled(auctionId);
-        if (Boolean.TRUE.equals(alreadySettled)) {
-            throw new IllegalStateException("이미 정산이 완료된 건입니다.");
-        }
+        if (Boolean.TRUE.equals(alreadySettled)) return;
 
-        //정산 대상 정보 조회 (판매자 ID, 낙찰 금액 등)
         EcommerceSettlementLogBean info = ecommerceMapper.getSettlementInfo(auctionId);
-        int sellerId = info.getSeller_id();
-        int totalAmount = info.getFinal_price();
+        if (info == null) return;
 
-        //정산 금액 계산 (예: 수수료 10%)
-        int rewardAmount = (int)(totalAmount * (1 - FEE_RATE));
+        int reward = (int) (info.getFinal_price() * (1 - FEE_RATE));
+        info.setReward_amount(reward);
+        info.setFee_rate(FEE_RATE);
+        info.setAuction_id(auctionId);
 
-        // 로그 추가
-        EcommerceSettlementLogBean settlementLog = new EcommerceSettlementLogBean();
-        settlementLog.setAuction_id(auctionId);
-        settlementLog.setSeller_id(sellerId);
-        settlementLog.setFinal_price(totalAmount);
-        settlementLog.setReward_amount(rewardAmount);
-        settlementLog.setFee_rate(FEE_RATE);  // 수수료율은 추후 상수로 관리 가능
+        ecommerceMapper.insertSettlementLog(info);
+        ecommerceMapper.markSettlementDone(auctionId);
+    }
 
-        ecommerceMapper.insertSettlementLog(settlementLog);
+    // 주문 상세 조회
+    public EcommerceOrderDetailBean getOrderDetail(int orderId) {
+        return ecommerceMapper.getOrderDetailById(orderId);
+    }
 
-        //KatteMoney 지급 로그 등록
-        UserKatteMoneyLogBean log = new UserKatteMoneyLogBean();
-        log.setUser_id(sellerId);
-        log.setChange_amount(rewardAmount);
-        log.setReason(UserKatteMoneyLogBean.reason.CHARGE); // enum('CHARGE','USED','REFUND','REWARD') 등에서 정의된 값
+    // 결제 이력 조회
+    public List<EcommercePaymentBean> getPaymentHistoryByUserId(int userId) {
+        return ecommerceMapper.getPaymentHistoryByUserId(userId);
+    }
 
-        userMapper.addKatteMoneyLog(log);  // 기존에 정의된 메서드 재사용
-
-        //정산 완료 처리
-        ecommerceMapper.markSettlementDone(auctionId);  // auction_data 테이블의 is_settle_amount = true
+    // 주문 이력 조회
+    public List<EcommerceOrderHistoryBean> getOrderHistory(int userId) {
+        return ecommerceMapper.getOrderHistoryByUserId(userId);
     }
 }

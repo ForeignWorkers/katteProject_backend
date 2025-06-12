@@ -56,8 +56,7 @@ public class ProductController {
     @GetMapping ("/product")
     //API Docs
     @Operation(summary = "상품 조회", description = "상품을 product_id를 이용해 조회")
-    public ResponseEntity<ProductInfoBean> getProductById(@RequestParam("product_id") int productId) {
-        ProductInfoBean product = productService.getProductById(productId);
+    public ResponseEntity<ProductInfoBean> getProductById(@RequestParam("product_id") int productId) {        ProductInfoBean product = productService.getProductById(productId);
 
         if (product != null) {
             return ResponseEntity.ok(product);
@@ -273,4 +272,6 @@ public class ProductController {
     public ResponseEntity<Integer> getSoldOutCount() {
         return ResponseEntity.ok(productService.getSoldOutProductCount());
     }
+
+
 }
