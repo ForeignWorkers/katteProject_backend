@@ -1,9 +1,11 @@
 package me.soldesk.katteproject_backend.service;
 
+
 import common.bean.auction.AuctionBidLog;
 import common.bean.auction.AuctionDataBean;
 import common.bean.auction.AuctionWinResultBean;
 import common.bean.ecommerce.EcommerceOrderBean;
+import common.util.*;
 import me.soldesk.katteproject_backend.mapper.AuctionMapper;
 import me.soldesk.katteproject_backend.mapper.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,6 @@ public class AuctionService {
     @Autowired
     private EcommerceService ecommerceService;
 
-    // 경매 등록
     public void registerAuction(AuctionDataBean auctionBean) {
         int days = Integer.parseInt(auctionBean.getSale_period());
         LocalDateTime endDateTime = LocalDateTime.now().plusDays(days);
@@ -34,7 +35,10 @@ public class AuctionService {
         auctionBean.setAuction_end_time(endDate);
 
         auctionBean.setCurrent_price(auctionBean.getStart_price());
-        auctionBean.setAuction_insert_term(calculateAuctionInsertTerm(auctionBean.getStart_price()));
+
+        // com_lib util import
+        auctionBean.setAuction_insert_term(AuctionUtil.calculateAuctionInsertTerm(auctionBean.getStart_price()));
+
         auctionBean.setIs_settle_amount(false);
 
         if (auctionBean.getProduct_size_id() != null) {
@@ -45,14 +49,6 @@ public class AuctionService {
         }
 
         auctionMapper.insertAuctionData(auctionBean);
-    }
-
-    // 입찰 단위 계산
-    private int calculateAuctionInsertTerm(int price) {
-        if (price < 50000) return 1000;
-        if (price < 100000) return 5000;
-        if (price < 300000) return 10000;
-        return 20000;
     }
 
     // 경매 ID로 경매 조회
