@@ -1,38 +1,49 @@
 package me.soldesk.katteproject_backend.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.*;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
 @Configuration
-public class WebMvcConfig implements WebMvcConfigurer {
+@EnableWebSecurity
+public class WebMvcConfig {
 
-    @Autowired
-    private me.soldesk.katteproject_backend.config.JwtInterceptor jwtInterceptor;
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(jwtInterceptor)
-                .addPathPatterns("/**")                     // 모든 경로 적용
-                .excludePathPatterns("/user/login", "/user", "/swagger-ui/**", "/v3/api-docs/**"); // 로그인 등은 제외
+    // ✅ 비밀번호 암호화 Bean 등록
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
+    // ✅ CORS 설정 (모든 요청 허용)
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // 모든 경로에 대해
-                        .allowedOrigins("http://localhost:8080") // 허용할 Origin
-                        .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메소드
-                        .allowCredentials(true); // 쿠키 등 자격 정보 허용
+                registry.addMapping("/**")
+                        .allowedOrigins("*")       // 모든 Origin 허용
+                        .allowedMethods("*")       // 모든 HTTP 메서드 허용
+                        .allowedHeaders("*")
+                        .allowCredentials(false);  // 쿠키 허용 X
             }
         };
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())  // ✅ 최신 방식
+                .cors(Customizer.withDefaults())  // ✅ cors 설정을 등록된 Bean에 따라 활성화
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
+                );
+
+        return http.build();
     }
 }
