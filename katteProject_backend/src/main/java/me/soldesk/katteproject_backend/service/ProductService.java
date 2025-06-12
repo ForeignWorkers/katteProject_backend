@@ -97,7 +97,7 @@ public class ProductService {
         }
 
         //허용된 카테고리인지 검사
-        String category = product.getCategory().getDbValue(); // "shoes", "tops" 등
+        String category = product.getCategory(); // "shoes", "tops" 등
         if (!ALLOWED_CATEGORIES.contains(category)) {
             throw new IllegalArgumentException("해당 카테고리는 사이즈 등록이 허용되지 않습니다.");
         }
@@ -110,27 +110,26 @@ public class ProductService {
         productMapper.insertProductSize(sizeBean);
     }
 
-    //상품 카테고리 사이즈 허용 목록 정의("신발", "상의", "아우터", "하의")
-    private static final Set<String> ALLOWED_CATEGORIES = Set.of("shoes", "tops", "outer", "pants");
+    // 상품 카테고리 중 사이즈 등록이 허용된 카테고리 목록
+    private static final Set<String> ALLOWED_CATEGORIES = Set.of("신발", "상의", "아우터", "하의");
 
-    //카테고리별 허용 사이즈값 정의
+    // 카테고리별 허용 사이즈값 정의
     private boolean isValidSize(String category, String sizeValue) {
         switch (category) {
-            case "shoes":
+            case "신발":
                 try {
                     int size = Integer.parseInt(sizeValue);
                     return size >= 220 && size <= 300 && size % 5 == 0;
                 } catch (NumberFormatException e) {
                     return false;
                 }
-            case "tops":
-            case "outer":
-            case "pants":
+            case "상의":
+            case "아우터":
+            case "하의":
                 return List.of("XS", "S", "M", "L", "XL", "XXL", "Free").contains(sizeValue);
             default:
                 return sizeValue.equalsIgnoreCase("allsize");
         }
-
     }
 
     //판매 상품 등록
