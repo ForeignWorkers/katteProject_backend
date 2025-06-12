@@ -1,87 +1,110 @@
 package me.soldesk.katteproject_backend.controller;
 
-import common.bean.ecommerce.EcommerceCoupon;
-import common.bean.ecommerce.EcommerceCouponHistory;
+import common.bean.ecommerce.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import me.soldesk.katteproject_backend.service.EcommerceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
+@RequestMapping("/ecommerce")
 public class EcommerceController {
+
     @Autowired
     private EcommerceService ecommerceService;
 
-    @PostMapping("/admin/coupon")
-    //API Docs
-    @Operation(summary = "쿠폰데이터 등록", description = "쿠폰 데이터를 등록합니다.")
+    @Operation(summary = "주문 생성", description = "경매 낙찰 또는 즉시구매에 따른 주문을 생성합니다.")
+    @ApiResponse(responseCode = "200", description = "주문 생성 성공")
+    @ApiResponse(responseCode = "400", description = "요청 데이터 오류")
+    @PostMapping("/order")
+    public ResponseEntity<String> createOrder(@RequestBody EcommerceOrderBean order) {
+        int orderId = ecommerceService.createAuctionOrder(order);
+        return ResponseEntity.ok("주문 생성 완료 (order_id: " + orderId + ")");
+    }
+
+    @Operation(summary = "결제 실행", description = "주문에 대한 결제를 수행합니다.")
+    @ApiResponse(responseCode = "200", description = "결제 성공")
+    @ApiResponse(responseCode = "400", description = "예수금 부족 또는 요청 오류")
+    @PostMapping("/payment/execute")
+    public ResponseEntity<String> executePayment(@RequestBody EcommercePaymentBean payment) {
+        int paymentId = ecommerceService.executePayment(
+                payment.getOrder_id(),
+                payment.getUser_id(),
+                payment.getAmount()
+        );
+        return ResponseEntity.ok("결제 성공 (payment_id: " + paymentId + ")");
+    }
+
+    @Operation(summary = "구매 확정", description = "배송 완료된 주문에 대해 구매 확정을 수행합니다.")
+    @ApiResponse(responseCode = "200", description = "구매 확정 성공")
+    @ApiResponse(responseCode = "400", description = "조건 미충족 또는 잘못된 요청")
+    @PatchMapping("/order/confirm")
+    public ResponseEntity<String> confirmOrder(@RequestParam int order_id, @RequestParam int user_id) {
+        boolean result = ecommerceService.confirmOrder(order_id, user_id);
+        if (!result) return ResponseEntity.badRequest().body("구매 확정 조건 불충분");
+        return ResponseEntity.ok("구매 확정 완료");
+    }
+
+    @Operation(summary = "주문 상세 조회", description = "주문 ID에 해당하는 상세 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "404", description = "주문 정보 없음")
+    @GetMapping("/order/detail")
+    public ResponseEntity<EcommerceOrderDetailBean> getOrderDetail(@RequestParam int order_id) {
+        EcommerceOrderDetailBean detail = ecommerceService.getOrderDetail(order_id);
+        return ResponseEntity.ok(detail);
+    }
+
+    @Operation(summary = "주문 이력 조회", description = "해당 유저의 전체 주문 이력을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/order/history")
+    public ResponseEntity<List<EcommerceOrderHistoryBean>> getOrderHistory(@RequestParam int user_id) {
+        return ResponseEntity.ok(ecommerceService.getOrderHistory(user_id));
+    }
+
+    @Operation(summary = "결제 이력 조회", description = "해당 유저의 전체 결제 이력을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @GetMapping("/payment/history")
+    public ResponseEntity<List<EcommercePaymentBean>> getPaymentHistory(@RequestParam int user_id) {
+        return ResponseEntity.ok(ecommerceService.getPaymentHistoryByUserId(user_id));
+    }
+
+    @Operation(summary = "쿠폰 등록", description = "관리자가 새로운 쿠폰을 등록합니다.")
     @ApiResponse(responseCode = "200", description = "등록 성공")
     @ApiResponse(responseCode = "400", description = "파라미터 에러")
-    public ResponseEntity<String> registerCouponData(@RequestBody EcommerceCoupon coupon) {
-        ecommerceService.addCouponData(coupon);
-        return ResponseEntity.ok("쿠폰 등록이 완료 되었습니다.");
-    }
-
-    @DeleteMapping("/admin/coupon")
-    //API Docs
-    @Operation(summary = "쿠폰데이터 삭제", description = "쿠폰 데이터를 삭제합니다.")
-    @ApiResponse(responseCode = "200", description = "삭제 성공")
-    @ApiResponse(responseCode = "400", description = "파라미터 에러")
-    public ResponseEntity<String> deleteCouponData(@RequestParam int coupon_id) {
-        ecommerceService.deleteCouponData(coupon_id);
-        return ResponseEntity.ok("쿠폰 삭제가 완료 되었습니다.");
-    }
-
     @PostMapping("/coupon")
-    //API Docs
-    @Operation(summary = "쿠폰를 유저에게 할당", description = "특정 유저에게 쿠폰 데이터를 등록합니다.")
+    public ResponseEntity<String> registerCoupon(@RequestBody EcommerceCoupon coupon) {
+        ecommerceService.registerCoupon(coupon);
+        return ResponseEntity.ok("쿠폰 등록 완료");
+    }
+
+    @Operation(summary = "쿠폰을 유저에게 할당", description = "특정 유저에게 쿠폰 데이터를 등록합니다.")
     @ApiResponse(responseCode = "200", description = "등록 성공")
     @ApiResponse(responseCode = "400", description = "파라미터 에러")
-    public ResponseEntity<String> addCouponForUser(@RequestBody EcommerceCouponHistory couponHistory) {
-        ecommerceService.addCouponHistoryUser(couponHistory);
-        return ResponseEntity.ok(String.format("유저 %d 쿠폰 등록이 완료 되었습니다",couponHistory.getUser_id()));
+    @PostMapping("/coupon/assign")
+    public ResponseEntity<String> assignCouponToUser(@RequestBody EcommerceCouponHistory couponHistory) {
+        ecommerceService.assignCouponToUser(couponHistory);
+        return ResponseEntity.ok("쿠폰 할당 완료");
     }
 
-    @PatchMapping("/coupon")
-    public ResponseEntity<String> updateCouponHistory(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime use_date,
-            @RequestParam int coupon_id,
-            @RequestParam int user_id) {
-
-        ecommerceService.updateCouponHistoryUse(use_date, user_id, coupon_id);
-        return ResponseEntity.ok(String.format("유저 %d 쿠폰이 사용 완료 되었습니다", user_id));
+    @Operation(summary = "쿠폰 사용 처리", description = "유저가 사용한 쿠폰에 대해 사용일자를 기록합니다.")
+    @ApiResponse(responseCode = "200", description = "사용 처리 완료")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    @PatchMapping("/coupon/use")
+    public ResponseEntity<String> useCoupon(@RequestParam int user_id, @RequestParam int coupon_id) {
+        ecommerceService.markCouponAsUsed(user_id, coupon_id);
+        return ResponseEntity.ok("쿠폰 사용 처리 완료");
     }
 
-    @GetMapping("/coupon/user")
-    //API Docs
-    @Operation(summary = "유저의 쿠폰을 조회", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공")
-    @ApiResponse(responseCode = "400", description = "파라미터 에러")
-    public ResponseEntity<List<EcommerceCouponHistory>> getCouponHistory(@RequestParam int user_id) {
-        return ResponseEntity.ok(ecommerceService.getCouponHistoryByUserId(user_id));
-    }
-
-    @GetMapping("/coupon/data")
-    //API Docs
-    @Operation(summary = "쿠폰의 데이터 조회", description = "")
-    @ApiResponse(responseCode = "200", description = "조회 성공")
-    @ApiResponse(responseCode = "400", description = "파라미터 에러")
-    public ResponseEntity<EcommerceCoupon> getCouponData(@RequestParam int coupon_id) {
-        return ResponseEntity.ok(ecommerceService.getCouponDataByCouponId(coupon_id));
-    }
-
-    @PatchMapping("/settlement")
-    @Operation(summary = "판매금 정산 처리 요청", description = "auction_id로 낙찰 정산 상태를 처리합니다. 상태가 'sold_out'일 경우만 정산이 가능합니다.")
-    @ApiResponse(responseCode = "200", description = "정산 처리 성공")
-    @ApiResponse(responseCode = "400", description = "정산 처리 실패 또는 조건 불충족")
-    public ResponseEntity<String> requestSettlement(@RequestParam("auction_id") int auctionId) {
-        ecommerceService.requestSettlement(auctionId);
-        return ResponseEntity.ok(String.format("auction_id=%d의 낙찰 금액 정산 처리가 완료되었습니다.", auctionId));
+    @Operation(summary = "정산 처리", description = "경매 낙찰 후 판매자에게 정산 정보를 기록합니다.")
+    @ApiResponse(responseCode = "200", description = "정산 성공")
+    @ApiResponse(responseCode = "400", description = "정산 조건 미충족 또는 중복 정산")
+    @PostMapping("/settlement")
+    public ResponseEntity<String> processSettlement(@RequestParam int auction_id) {
+        ecommerceService.settleOrder(auction_id);
+        return ResponseEntity.ok("정산 처리 완료");
     }
 }

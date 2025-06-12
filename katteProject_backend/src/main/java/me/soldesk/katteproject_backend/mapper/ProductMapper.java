@@ -184,7 +184,7 @@ public interface ProductMapper {
         cs.like_count DESC
     LIMIT #{size} OFFSET #{offset}
 """)
-    List<ProductKatteRecommendBean> getKatteRecommendedProductsTop5(
+    List<ProductKatteRecommendBean> getKatteRecommendedProducts(
             @Param("offset") int offset,
             @Param("size") int size);
 
