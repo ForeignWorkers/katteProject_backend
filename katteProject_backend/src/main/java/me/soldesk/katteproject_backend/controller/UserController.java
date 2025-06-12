@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import me.soldesk.katteproject_backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -19,6 +20,10 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
 
     @PostMapping("/user")
     //API Docs
@@ -105,9 +110,15 @@ public class UserController {
     @Operation(summary = "로그인 가능 여부 확인", description = "바디에 유저 이메일, 비밀번호 넣기")
     public ResponseEntity<Boolean> login(@RequestBody Map<String,String> loginData) {
         String email_id = loginData.get("email_id");
-        String password = loginData.get("password");
+        String rawPassword = loginData.get("password");
 
-        boolean result = userService.existsUserInfo(email_id, password);
+        UserBean user = userService.getUserInfo(null,email_id);
+
+        if (user == null) return ResponseEntity.ok(false);
+
+        // 서버가 가지고 있는 암호화된 패스워드와 비교
+        boolean result =  passwordEncoder.matches(rawPassword, user.getPassword());
+
         return ResponseEntity.ok(result);
     }
 
