@@ -25,7 +25,6 @@ public class CsStandardController {
         try {
             int addedRaw = csStandardService.addStandard(csStandardBean);
             if(addedRaw > 0) {
-                csStandardService.addStandard(csStandardBean);
                 return ResponseEntity.ok("검수 기준이 등록되었습니다.");
             }else{
                 return new ResponseEntity<>("검수 기준 작성중 에러가 발생했습니다.", HttpStatus.BAD_REQUEST);

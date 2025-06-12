@@ -30,7 +30,6 @@ public class CsReplyController {
         try {
             int addedRaw = csReplyService.addReply(csReplyBean);
             if(addedRaw > 0){
-                csReplyService.addReply(csReplyBean);
                 return ResponseEntity.ok("문의 답변이 등록되었습니다.");
             }else{
                 return new ResponseEntity<>("문의 답변 작성중 에러가 발생했습니다.", HttpStatus.BAD_REQUEST);

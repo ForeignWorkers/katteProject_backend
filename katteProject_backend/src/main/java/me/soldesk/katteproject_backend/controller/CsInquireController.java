@@ -25,7 +25,6 @@ public class CsInquireController {
        try {
            int addedRaw = csInquireCustomerService.addCsInquireCustomer(csInquireCustomerBean);
            if(addedRaw > 0) {
-               csInquireCustomerService.addCsInquireCustomer(csInquireCustomerBean);
                return ResponseEntity.ok("문의가 등록되었습니다.");
            }else{
                return new ResponseEntity<>("문의 작성중 에러가 발생했습니다", HttpStatus.BAD_REQUEST);

@@ -26,7 +26,6 @@ public class CsFaqController {
         try {
             int addedRaw = csFaqService.addFaq(csFaqBean);
             if(addedRaw > 0) {
-                csFaqService.addFaq(csFaqBean);
                 return ResponseEntity.ok("자주 묻는 질문이 등록되었습니다.");
             }else{
                 return new ResponseEntity<>("자주 묻는 질문 작성중 에러가 발생했습니다.", HttpStatus.BAD_REQUEST);
