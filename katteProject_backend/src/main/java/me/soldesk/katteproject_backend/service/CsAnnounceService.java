@@ -16,6 +16,7 @@ public class CsAnnounceService {
 
     //공지사항 작성
     public int addCsAnnounce(CsAnnounceBean csAnnounceBean) {
+        System.out.println("등록");
         return csMapper.addAnnounce(csAnnounceBean);
     }
 

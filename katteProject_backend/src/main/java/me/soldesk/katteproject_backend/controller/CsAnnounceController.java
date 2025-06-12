@@ -28,7 +28,6 @@ public class CsAnnounceController {
         try {
             int addedRaw = csAnnounceService.addCsAnnounce(csAnnounceBean);
             if(addedRaw > 0) {
-                csAnnounceService.addCsAnnounce(csAnnounceBean);
                 return ResponseEntity.ok("문의가 등록되었습니다.");
             }else{
                 return new ResponseEntity<>("문의 작성중 에러가 발생했습니다", HttpStatus.BAD_REQUEST);
