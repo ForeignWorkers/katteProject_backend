@@ -120,4 +120,8 @@ public class ContentService {
     public int getStyleCommentCountByUserId(int userId) {
         return contentMapper.countStyleCommentByUserId(userId);
     }
+
+    public ContentShortformBean getShortOneRandom(){
+        return contentMapper.getRandomShort();
+    }
 }

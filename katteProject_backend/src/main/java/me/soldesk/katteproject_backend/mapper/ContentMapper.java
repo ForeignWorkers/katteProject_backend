@@ -138,4 +138,7 @@ public interface ContentMapper {
 
     @Select("SELECT COUNT(*) FROM content_stylecomment WHERE user_id = #{userId}")
     int countStyleCommentByUserId(int userId);
+
+    @Select("SELECT * FROM content_shortform ORDER BY RAND() LIMIT 1")
+    ContentShortformBean getRandomShort();
 }

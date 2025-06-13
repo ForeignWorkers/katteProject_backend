@@ -159,7 +159,7 @@ public class ContentController {
         return ResponseEntity.ok(likedStyles);
     }
 
-    @PostMapping("/content/short/like")
+    @PatchMapping("/content/short/like")
     //API Docs
     @Operation(summary = "숏폼 좋아요 토글", description = "특정 숏폼에 대한 좋아요 토글")
     @ApiResponse(responseCode = "200", description = "성공")
@@ -169,5 +169,11 @@ public class ContentController {
         return ResponseEntity.ok(liked);
     }
 
-
+    @GetMapping("/content/short/one_random")
+    @Operation(summary = "숏폼 좋아요 토글", description = "특정 숏폼에 대한 좋아요 토글")
+    @ApiResponse(responseCode = "200", description = "성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<ContentShortformBean> getOneRandom() {
+        return ResponseEntity.ok(contentService.getShortOneRandom());
+    }
 }
