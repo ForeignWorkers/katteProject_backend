@@ -15,10 +15,11 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    public void addUserInfo(UserBean joinUserBean) {
-        userMapper.addUserInfo(joinUserBean);
+    public UserBean addUserInfo(UserBean joinUserBean) {
+        userMapper.insertUser(joinUserBean);
         //회원 가입 동시에 페이먼트 테이블 함께 생성
         createDefaultUserPayment(Integer.toString(joinUserBean.getUser_id()));
+        return joinUserBean;
     }
 
     public UserBean getUserInfo(String user_id, String email_id) {

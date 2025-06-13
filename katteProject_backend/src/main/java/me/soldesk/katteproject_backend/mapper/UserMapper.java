@@ -7,15 +7,17 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    @Insert("INSERT INTO user_info (" +
-            "email_id, password, first_name, second_name, nickname, " +
-            "phone_number, birth_date, introduce_desc, profile_url, is_admin" +
-            ") VALUES (" +
-            "#{email_id}, #{password}, #{first_name}, #{second_name}, #{nickname}, " +
-            "#{phone_number}, #{birth_date}, #{introduce_desc}, #{profile_url}, #{is_admin}" +
-            ")")
+    @Insert("""
+        INSERT INTO user_info (
+            email_id, password, first_name, second_name, nickname,
+            phone_number, birth_date, introduce_desc, profile_url, is_admin
+        ) VALUES (
+            #{email_id}, #{password}, #{first_name}, #{second_name}, #{nickname},
+            #{phone_number}, #{birth_date}, #{introduce_desc}, #{profile_url}, #{is_admin}
+        )
+    """)
     @Options(useGeneratedKeys = true, keyProperty = "user_id")
-    void addUserInfo(UserBean user);
+    void insertUser(UserBean user);
 
     @Select("SELECT * FROM user_info WHERE user_id = #{user_id}")
     UserBean getUserInfoById(int user_id);

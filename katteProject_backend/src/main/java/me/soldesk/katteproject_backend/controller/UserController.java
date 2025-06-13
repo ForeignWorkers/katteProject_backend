@@ -30,14 +30,14 @@ public class UserController {
     @Operation(summary = "유저 등록", description = "유저를 새롭게 등록합니다.")
     @ApiResponse(responseCode = "200", description = "성공")
     @ApiResponse(responseCode = "400", description = "파라미터 에러")
-    public ResponseEntity<String> addUserinfo(@RequestBody @Valid UserBean userBean, BindingResult result) {
+    public ResponseEntity<UserBean> addUserinfo(@RequestBody @Valid UserBean userBean, BindingResult result) {
 
         if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result.getAllErrors().toString());
+            return ResponseEntity.badRequest().body(null);
         }
 
-        userService.addUserInfo(userBean);
-        return ResponseEntity.ok("유저 등록이 되었습니다 !");
+        UserBean signedUser = userService.addUserInfo(userBean);
+        return ResponseEntity.ok(signedUser);
     }
 
     @GetMapping("/user")
