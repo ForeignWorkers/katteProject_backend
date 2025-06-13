@@ -55,12 +55,13 @@ public class ContentController {
     @Operation(summary = "스타일 등록", description = "스타일 게시물을 등록합니다.")
     @ApiResponse(responseCode = "200", description = "성공")
     @ApiResponse(responseCode = "400", description = "파라미터 에러")
-    public ResponseEntity<String> addContentStyle(@RequestBody ContentStyleBean styleBean) {
-        contentService.addStyle(styleBean);
-        int contentId = styleBean.getId();
-        contentService.linkStyleWithHashtag(contentId,styleBean.getHashtags());
+    public ResponseEntity<Integer> addContentStyle(@RequestBody ContentStyleBean styleBean) {
+        // 1) 스타일 저장 후 생성된 ID를 반환받아 변수에 담고
+        int contentId = contentService.addStyleAndReturnId(styleBean);
+        // 2) 해시태그 리스트와 함께 join 테이블에 연결
+        contentService.linkStyleWithHashtag(contentId, styleBean.getHashtags());
 
-        return ResponseEntity.ok("스타일 등록이 완료 되었습니다.");
+        return ResponseEntity.ok(contentId);
     }
 
     @GetMapping("/content/style/hashtag")
@@ -125,8 +126,8 @@ public class ContentController {
     @ApiResponse(responseCode = "200", description = "성공")
     @ApiResponse(responseCode = "400", description = "파라미터 에러")
     public ResponseEntity<List<ContentStyleComment>> getStyleCommentByUserId(@RequestParam int user_id,
-                                                                          @RequestParam(defaultValue = "10") int count,
-                                                                          @RequestParam(defaultValue = "0") int offset) {
+                                                                             @RequestParam(defaultValue = "10") int count,
+                                                                             @RequestParam(defaultValue = "0") int offset) {
         return ResponseEntity.ok(contentService.getStyleCommentByUserId(user_id, count, offset));
     }
 
@@ -176,4 +177,15 @@ public class ContentController {
     public ResponseEntity<ContentShortformBean> getOneRandom() {
         return ResponseEntity.ok(contentService.getShortOneRandom());
     }
+
+    @GetMapping("/content/style/recent")
+    public ResponseEntity<List<ContentStyleBean>> recentStyles(
+            @RequestParam(name = "size",   defaultValue = "10")  int size,
+            @RequestParam(name = "offset", defaultValue = "0")   int offset
+    ) {
+        List<ContentStyleBean> list = contentService.getRecentStylesByOffset(size, offset);
+        return ResponseEntity.ok(list);
+    }
+
+
 }
