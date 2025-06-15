@@ -39,7 +39,7 @@ public interface CsMapper {
     @Select("SELECT * FROM cs_announce WHERE announce_category = #{announce_category}" +
             "ORDER BY announce_at DESC, announce_id DESC limit #{count} offset #{offset}")
     List<CsAnnounceBean> getAnnounceByCategory(
-            @Param("announce_category") CsAnnounceBean.announce_category announce_category,
+            @Param("announce_category") CsAnnounceBean.Announce_Category announce_category,
             int count,
             int offset);
 
@@ -50,7 +50,7 @@ public interface CsMapper {
             "where announce_id = #{announce_id}")
     int updateAnnounce(
             @Param("announce_id") int announce_id,
-            @Param("announce_category") CsAnnounceBean.announce_category announce_category,
+            @Param("announce_category") CsAnnounceBean.Announce_Category announce_category,
             @Param("announce_title") String announce_title,
             @Param("announce_content") String announce_content
     );
@@ -83,7 +83,7 @@ public interface CsMapper {
     @Select("SELECT * FROM cs_support_faq WHERE faq_category = #{faq_category}" +
             "ORDER BY created_at DESC, faq_id DESC limit #{count} offset #{offset}")
     List<CsFaqBean> getFaqByCategory(
-            @Param("faq_category") CsFaqBean.faq_category faq_category,
+            @Param("faq_category") CsFaqBean.Faq_Category faq_category,
             int count,
             int offset);
 
@@ -95,7 +95,7 @@ public interface CsMapper {
             "where faq_id = #{faq_id}")
     int updateFaq(
             @Param("faq_id") int announce_id,
-            @Param("faq_category") CsFaqBean.faq_category faq_category,
+            @Param("faq_category") CsFaqBean.Faq_Category faq_category,
             @Param("faq_title") String faq_title,
             @Param("faq_content") String faq_content
     );
@@ -132,7 +132,7 @@ public interface CsMapper {
             " ORDER BY inquire_at DESC, inquire_id DESC limit #{count} offset #{offset}")
     List<CsInquireCustomerBean> getAllInquiresByStatusCustomer(
             @Param("user_id") int user_id,
-            @Param("inquire_status") CsInquireCustomerBean.inquire_status inquire_status,
+            @Param("inquire_status") CsInquireCustomerBean.Inquire_Status inquire_status,
             int count,
             int offset);
 
@@ -144,7 +144,7 @@ public interface CsMapper {
     int updateCsInquireCustomer(
             @Param("user_id") int user_id,
             @Param("inquire_id") int inquire_id,
-            @Param("inquire_category") CsInquireCustomerBean.inquire_category inquire_category,
+            @Param("inquire_category") CsInquireCustomerBean.Inquire_Category inquire_category,
             @Param("inquire_title") String inquire_title,
             @Param("inquire_content") String inquire_content
     );
@@ -171,7 +171,7 @@ public interface CsMapper {
     @Select("SELECT * FROM cs_inquire_customer WHERE inquire_status = #{inquire_status}" +
             "ORDER BY inquire_at DESC, inquire_id DESC limit #{count} offset #{offset}")
     List<CsInquireCustomerBean> getAllInquiresByStatusAdmin(
-            @Param("inquire_status") CsInquireCustomerBean.inquire_status inquire_status,
+            @Param("inquire_status") CsInquireCustomerBean.Inquire_Status inquire_status,
             int count,
             int offset
     );
@@ -196,7 +196,7 @@ public interface CsMapper {
     @Delete("delete from cs_reply_admin where reply_id = #{reply_id};")
     int deleteCsReply(
             @Param("reply_id") int reply_id
-            );
+    );
 
     //검수 기준 ---------------------------------------------------------------------------------------------------------
     //검수 기준 직접 작성
@@ -208,7 +208,7 @@ public interface CsMapper {
     // standard_category를 통해 검수 기준 상세 출력
     @Select("SELECT * FROM cs_test_standard WHERE standard_category = #{standard_category}")
     List<CsStandardBean> getStandard(
-            @Param("standard_category") CsStandardBean.standard_category standard_category);
+            @Param("standard_category") CsStandardBean.Standard_Category standard_category);
 
     // 검수 기준 질문 수정
     @Update("update cs_test_standard " +
@@ -217,7 +217,7 @@ public interface CsMapper {
             "where standard_id = #{standard_id}")
     int updateStandard(
             @Param("standard_id") int standard_id,
-            @Param("standard_category") CsStandardBean.standard_category standard_category,
+            @Param("standard_category") CsStandardBean.Standard_Category standard_category,
             @Param("standard_content") String standard_content
     );
 

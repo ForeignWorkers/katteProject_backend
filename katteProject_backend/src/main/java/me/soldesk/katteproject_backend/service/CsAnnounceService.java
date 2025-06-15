@@ -36,6 +36,8 @@ public class CsAnnounceService {
             }
         }else if(count != null && offset != null) { //공지 ID를 받지 않은 경우에는 공지 내역 목록을 리스트로.
             List<CsAnnounceBean> announceList = csMapper.getAnnounce(count, offset);
+            System.out.println("count: " + count);
+            System.out.println("offset: " + offset);
             return announceList;
         } else {
             throw new IllegalArgumentException("공지사항이 존재하지 않습니다.");
@@ -43,7 +45,7 @@ public class CsAnnounceService {
     }
 
     //공지사항 카테고리에 따른 리스트
-    public List<CsAnnounceBean> getAnnounceByCategory(CsAnnounceBean.announce_category announce_category,
+    public List<CsAnnounceBean> getAnnounceByCategory(CsAnnounceBean.Announce_Category announce_category,
                                                       int count, int offset){
         return csMapper.getAnnounceByCategory(announce_category, count, offset);
     }
@@ -51,11 +53,16 @@ public class CsAnnounceService {
 
     //공지사항 수정
     public int updateAnnounce(CsAnnounceBean csAnnounceBean) {
+        System.out.println("announce_id: " + csAnnounceBean.getAnnounce_id());
+        System.out.println("announce_category: " + csAnnounceBean.getAnnounce_category());
+        System.out.println("announce_title: " + csAnnounceBean.getAnnounce_title());
+        System.out.println("announce_content: " +  csAnnounceBean.getAnnounce_content());
         return csMapper.updateAnnounce(
                 csAnnounceBean.getAnnounce_id(),
                 csAnnounceBean.getAnnounce_category(),
                 csAnnounceBean.getAnnounce_title(),
                 csAnnounceBean.getAnnounce_content()
+
         );
     }
 

@@ -18,7 +18,7 @@ public class CsStandardService {
     }
 
     //검수 기준 목록 조회
-    public List<CsStandardBean> getStandard(CsStandardBean.standard_category standard_category) {
+    public List<CsStandardBean> getStandard(CsStandardBean.Standard_Category standard_category) {
         List<CsStandardBean> standardList = csMapper.getStandard(standard_category);
         return standardList;
     }

@@ -38,7 +38,7 @@ public class CsInquireCustomerService {
 
     //문의 조회 (처리 상태별로)
     public List<CsInquireCustomerBean> getCsInquireByCategoryCustomer(int user_id,
-                                                                      CsInquireCustomerBean.inquire_status inquire_status,
+                                                                      CsInquireCustomerBean.Inquire_Status inquire_status,
                                                                       int count, int offset){
         return csMapper.getAllInquiresByStatusCustomer(user_id, inquire_status, count, offset);
     }

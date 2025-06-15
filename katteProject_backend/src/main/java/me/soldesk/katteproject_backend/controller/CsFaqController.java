@@ -59,7 +59,7 @@ public class CsFaqController {
     @Operation(summary = "카테고리별로 자주 묻는 질문 조회", description = "자주 묻는 질문 카테고리별 조회에 사용. faq_category를 필수로 하며 " +
             "해당하는 카테고리로 분류해줌.")
     public ResponseEntity<List<CsFaqBean>> getFaqCategory(
-            @RequestParam CsFaqBean.faq_category faq_category,
+            @RequestParam CsFaqBean.Faq_Category faq_category,
             @RequestParam(defaultValue = "10") int count,
             @RequestParam(defaultValue = "0") int offset
             ){
