@@ -52,6 +52,12 @@ public class AuctionController {
         }
     }
 
+    @GetMapping("/auction/latest")
+    @Operation(summary = "최근 경매 ID 조회")
+    public ResponseEntity<Integer> getLatestAuctionId() {
+        return ResponseEntity.ok(auctionService.getLatestAuctionId());
+    }
+
     @PostMapping("/auction/bid")
     @Operation(summary = "경매 입찰 등록", description = "특정 경매에 대해 사용자의 입찰 가격을 등록합니다. 거래 종료 시 입찰 불가합니다.")
     @ApiResponse(responseCode = "200", description = "입찰 등록 성공")

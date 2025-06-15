@@ -3,8 +3,7 @@ package me.soldesk.katteproject_backend.mapper;
 import common.bean.auction.AuctionDataBean;
 import common.bean.ecommerce.EcommerceOrderBean;
 import common.bean.product.*;
-import common.bean.admin.InspectionProductViewBean;
-import common.bean.admin.RegisteredProductViewBean;
+import common.bean.admin.*;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -74,9 +73,15 @@ public interface ProductMapper {
         #{size_value}
     )
     """)
-
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insertProductSize(ProductSizeBean sizeBean);
+
+    //제품 사이즈 중복 검사 처리 위한 쿼리
+    @Select("""
+    SELECT COUNT(*) FROM product_size
+    WHERE product_id = #{product_id} AND size_value = #{size_value}
+    """)
+    int countSize(@Param("product_id") int product_id, @Param("size_value") String size_value);
 
     // 단일 상품 조회: 상품 ID를 기준으로 product_info 테이블에서 상품 정보
     @Select("SELECT * FROM product_info WHERE product_id = #{product_id}")
@@ -275,6 +280,10 @@ public interface ProductMapper {
     """)
     void insertCheckResult(ProductCheckResultBean checkResultBean);
 
+    //최신 product_per_sale의 id를 반환
+    @Select("SELECT id FROM product_per_sale ORDER BY id DESC LIMIT 1")
+    Integer getLatestPerSaleId();
+
     //검수 요청으로 인한 판매상태 업데이트
     @Update("""
         UPDATE product_per_sale
@@ -373,4 +382,19 @@ public interface ProductMapper {
     WHERE pcr.sale_step = 'sold_out'
     """)
     int getSoldOutCount();
+
+    //상품 id + 사이즈값으로 사이즈 조회
+    @Select("SELECT id FROM product_size WHERE product_id = #{productId} AND size_value = #{sizeValue}")
+    Integer getSizeId(@Param("productId") int productId, @Param("sizeValue") String sizeValue);
+
+    @Select("SELECT id FROM product_size ORDER BY id DESC LIMIT 1")
+    Integer selectLatestSizeId();
+
+    //경매 시간 세팅을 위한 mapper
+    @Select("SELECT * FROM product_check_result WHERE id = #{id}")
+    ProductCheckResultBean getCheckResultById(@Param("id") int id);
+
+    //경매 시간 세팅을 위한
+    @Select("SELECT auction_data_id FROM product_per_sale WHERE id = #{perSaleId}")
+    int getAuctionIdByPerSaleId(@Param("perSaleId") int perSaleId);
 }

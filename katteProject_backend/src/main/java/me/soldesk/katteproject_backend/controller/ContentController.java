@@ -50,6 +50,13 @@ public class ContentController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/content/short/latest")
+    @Operation(summary = "최근 숏폼 ID 조회")
+    public ResponseEntity<Integer> getLatestShortformId() {
+        int latestId = contentService.getLatestShortformId();
+        return ResponseEntity.ok(latestId); // ← 바로 latestId 리턴
+    }
+
     @PostMapping("/content/style")
     //API Docs
     @Operation(summary = "스타일 등록", description = "스타일 게시물을 등록합니다.")

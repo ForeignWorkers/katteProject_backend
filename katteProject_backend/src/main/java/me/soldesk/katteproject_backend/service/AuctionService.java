@@ -29,18 +29,22 @@ public class AuctionService {
     private EcommerceService ecommerceService;
 
     public void registerAuction(AuctionDataBean auctionBean) {
-        int days = Integer.parseInt(auctionBean.getSale_period());
-        LocalDateTime endDateTime = LocalDateTime.now().plusDays(days);
-        Date endDate = Date.from(endDateTime.atZone(ZoneId.of("Asia/Seoul")).toInstant());
-        auctionBean.setAuction_end_time(endDate);
+        //경매 시간 설정은 여기서 하지 않는다
+        auctionBean.setAuction_start_time(null); // 명시적으로 null
+        auctionBean.setAuction_end_time(null);   // 명시적으로 null
 
+        //현재가 = 시작가
         auctionBean.setCurrent_price(auctionBean.getStart_price());
 
-        // com_lib util import
-        auctionBean.setAuction_insert_term(AuctionUtil.calculateAuctionInsertTerm(auctionBean.getStart_price()));
+        //시작가 기반 수수료 계산
+        auctionBean.setAuction_insert_term(
+                AuctionUtil.calculateAuctionInsertTerm(auctionBean.getStart_price())
+        );
 
+        //초기 상태: 낙찰 아님
         auctionBean.setIs_settle_amount(false);
 
+        //사이즈 정보 있을 경우, 사이즈 값 가져오기
         if (auctionBean.getProduct_size_id() != null) {
             String sizeValue = productMapper.getSizeValueById(auctionBean.getProduct_size_id());
             auctionBean.setAuction_size_value(sizeValue);
@@ -48,12 +52,28 @@ public class AuctionService {
             auctionBean.setAuction_size_value(null);
         }
 
+        //DB에 저장
         auctionMapper.insertAuctionData(auctionBean);
+    }
+
+    // 예시: 검수 성공 → sale_step = ON_SALE 되는 시점에서 호출
+    public void markAuctionStart(int auctionId, String salePeriod) {
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime end = start.plusDays(Integer.parseInt(salePeriod));
+        Date startDate = Date.from(start.atZone(ZoneId.of("Asia/Seoul")).toInstant());
+        Date endDate = Date.from(end.atZone(ZoneId.of("Asia/Seoul")).toInstant());
+
+        auctionMapper.updateAuctionTime(auctionId, startDate, endDate);
     }
 
     // 경매 ID로 경매 조회
     public AuctionDataBean getAuctionById(int auctionId) {
         return auctionMapper.getAuctionById(auctionId);
+    }
+
+    // 최신 경매 id 조회
+    public Integer getLatestAuctionId() {
+        return auctionMapper.getLatestAuctionId();
     }
 
     // 입찰 로그 추가

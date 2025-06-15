@@ -38,6 +38,10 @@ public interface ContentMapper {
     @Select("SELECT * FROM content_shortform WHERE product_id = #{productId} LIMIT #{count} OFFSET #{offset}")
     List<ContentShortformBean> getShortformByProductId(int productId, int count, int offset);
 
+    //최근 숏폼 id 조회
+    @Select("SELECT id FROM content_shortform ORDER BY id DESC LIMIT 1")
+    Integer getLatestShortformId();
+
     @Insert("""
     INSERT INTO content_style (
         style_title,
