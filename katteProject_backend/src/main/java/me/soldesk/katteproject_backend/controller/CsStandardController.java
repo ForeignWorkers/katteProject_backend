@@ -39,7 +39,7 @@ public class CsStandardController {
     @Operation(summary = "검수 기준 조회", description = "standard_category를 포함해야 하며, 해당 카테고리의 검수 기준 내용이 출력")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     public ResponseEntity<List<CsStandardBean>> getStandard(
-            @RequestParam CsStandardBean.standard_category standard_category)
+            @RequestParam CsStandardBean.Standard_Category standard_category)
     {
         try {
             csStandardService.getStandard(standard_category);

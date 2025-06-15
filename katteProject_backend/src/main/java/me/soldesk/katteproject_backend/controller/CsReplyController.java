@@ -62,7 +62,7 @@ public class CsReplyController {
     @GetMapping("/cs/reply/status")
     @Operation(summary = "문의를 진행 상황별로 로드함", description = "inquire_status를 포함해야 함.PENDING, ONGOING, COMPLETE가 있음")
     public ResponseEntity<List<CsInquireCustomerBean>> getCsCategory(
-            @RequestParam CsInquireCustomerBean.inquire_status inquire_status,
+            @RequestParam CsInquireCustomerBean.Inquire_Status inquire_status,
             @RequestParam(defaultValue = "10") int count,
             @RequestParam(defaultValue = "0") int offset
             ){

@@ -59,7 +59,7 @@ public class CsInquireController {
     @GetMapping("/cs/inquiry/category")
     public ResponseEntity<List<CsInquireCustomerBean>> getCsCategory(
             @RequestParam int user_id,
-            @RequestParam CsInquireCustomerBean.inquire_status inquire_status,
+            @RequestParam CsInquireCustomerBean.Inquire_Status inquire_status,
             @RequestParam(defaultValue = "10") int count,
             @RequestParam(defaultValue = "0") int offset
             ){

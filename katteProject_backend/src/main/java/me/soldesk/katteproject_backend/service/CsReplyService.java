@@ -37,7 +37,7 @@ public class CsReplyService {
     }
 
     //문의 처리 상태에 따른 "문의" 리스트
-    public List<CsInquireCustomerBean> getCsInquireByStatusAdmin(CsInquireCustomerBean.inquire_status inquire_status, int count, int offset){
+    public List<CsInquireCustomerBean> getCsInquireByStatusAdmin(CsInquireCustomerBean.Inquire_Status inquire_status, int count, int offset){
         return csMapper.getAllInquiresByStatusAdmin(inquire_status, count, offset);
     }
 

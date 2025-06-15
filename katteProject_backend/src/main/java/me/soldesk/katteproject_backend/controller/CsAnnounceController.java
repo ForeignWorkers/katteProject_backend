@@ -65,7 +65,7 @@ public class CsAnnounceController {
     @Operation(summary = "공지사항을 카테고리별로 로드함", description = "announce_category를 반드시 포함해야하며, category는" +
             "ANNOUNCE, EVENT, ETC가 있음")
     public ResponseEntity<List<CsAnnounceBean>> getAnnounceByCategory(
-            @RequestParam CsAnnounceBean.announce_category announce_category,
+            @RequestParam CsAnnounceBean.Announce_Category announce_category,
             @RequestParam(defaultValue = "10") int count,
             @RequestParam(defaultValue = "0") int offset
             ){

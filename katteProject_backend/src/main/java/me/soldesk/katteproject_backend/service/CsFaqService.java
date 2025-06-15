@@ -38,7 +38,7 @@ public class CsFaqService
     }
 
     //문의 조회 (처리 상태별로)
-    public List<CsFaqBean> getFaqByCategory(CsFaqBean.faq_category faq_category,
+    public List<CsFaqBean> getFaqByCategory(CsFaqBean.Faq_Category faq_category,
                                             int count, int offset) {
         return csMapper.getFaqByCategory(faq_category, count, offset);
     }
