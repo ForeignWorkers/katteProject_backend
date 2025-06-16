@@ -172,7 +172,7 @@ public class AdminController {
     }
 
     //옥션 id를 통한 판매 항목 삭제
-    @DeleteMapping("/inspection/delete-one")
+    @DeleteMapping("/inspection/delete_one")
     @Operation(summary = "단일 판매 항목 삭제", description = "특정 auction_id에 해당하는 판매 항목을 삭제합니다 (조건: EXPIRED + 3일 경과).")
     @ApiResponse(responseCode = "200", description = "삭제 성공")
     @ApiResponse(responseCode = "400", description = "요청 실패")
@@ -185,7 +185,7 @@ public class AdminController {
         }
     }
 
-    @PatchMapping("/inspection/expire-now")
+    @PatchMapping("/inspection/expire_now")
     @Operation(summary = "만료 항목 즉시 삭제 예약", description = "EXPIRED 상태의 경매를 삭제 가능 상태로 즉시 조작합니다.")
     @ApiResponse(responseCode = "200", description = "예약 성공")
     @ApiResponse(responseCode = "400", description = "요청 실패")
