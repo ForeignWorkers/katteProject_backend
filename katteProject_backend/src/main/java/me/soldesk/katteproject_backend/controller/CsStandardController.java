@@ -42,13 +42,35 @@ public class CsStandardController {
             @RequestParam CsStandardBean.Standard_Category standard_category)
     {
         try {
-            csStandardService.getStandard(standard_category);
-            return ResponseEntity.ok(csStandardService.getStandard(standard_category));
+            List<CsStandardBean> sList = csStandardService.getStandard(standard_category);
+            for (CsStandardBean bean : sList) {
+                System.out.println("카테고리: " + bean.getStandard_category() + " / 내용: " + bean.getStandard_content());
+            }
+            return ResponseEntity.ok(sList);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/cs/standard/get")
+    @Operation(summary = "검수 기준 조회", description = "standard_id를 포함해야 하며, 해당 카테고리의 검수 기준 내용이 출력")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    public ResponseEntity<List<CsStandardBean>> getStandard(
+            @RequestParam int standard_id)
+    {
+        try {
+            List<CsStandardBean> sList = csStandardService.getStandard(standard_id);
+            for (CsStandardBean bean : sList) {
+                System.out.println("카테고리: " + bean.getStandard_category() + " / 내용: " + bean.getStandard_content());
+            }
+            return ResponseEntity.ok(sList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 
     @PatchMapping("/cs/standard/edit")
@@ -57,6 +79,9 @@ public class CsStandardController {
     public ResponseEntity<String> updateStandard(@RequestBody CsStandardBean csStandardBean){
         try{
             csStandardService.updateStandard(csStandardBean);
+            System.out.println("수정하려는 id : " + csStandardBean.getStandard_id());
+            System.out.println("수정하려 하는 카테고리 : " + csStandardBean.getStandard_category());
+            System.out.println("수정하려 하는 내용 : " + csStandardBean.getStandard_content());
             return ResponseEntity.ok("수정되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
