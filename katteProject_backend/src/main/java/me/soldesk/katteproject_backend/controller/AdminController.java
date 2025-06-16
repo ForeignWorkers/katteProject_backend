@@ -113,9 +113,19 @@ public class AdminController {
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @ApiResponse(responseCode = "400", description = "파라미터 에러")
     public ResponseEntity<List<UserAdminViewBean>> searchUsers(
-            @RequestParam String keyword
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "20") int size
     ) {
-        return ResponseEntity.ok(adminService.searchUsers(keyword));
+        return ResponseEntity.ok(adminService.searchUsers(keyword, offset, size));
+    }
+
+    @GetMapping("/users/search/count")
+    @Operation(summary = "유저 검색 결과 수 조회", description = "키워드에 해당하는 유저 총 수 반환")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<Integer> searchUsersCount(@RequestParam String keyword) {
+        return ResponseEntity.ok(adminService.searchUsersCount(keyword));
     }
 
     @GetMapping("/user")

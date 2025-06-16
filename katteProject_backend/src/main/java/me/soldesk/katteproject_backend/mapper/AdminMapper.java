@@ -78,15 +78,28 @@ public interface AdminMapper {
     @Select("SELECT COUNT(*) FROM user_admin_view")
     int getUserTotalCount();
 
-    //회원 검색
+    //회원 검색(페이징 처리 추가)
     @Select("""
-                SELECT * FROM user_admin_view
-                WHERE 
-                    nickname LIKE CONCAT('%', #{keyword}, '%')
-                    OR email_id LIKE CONCAT('%', #{keyword}, '%')
-                    OR CAST(user_id AS CHAR) = #{keyword}
-            """)
-    List<UserAdminViewBean> searchUsersByKeyword(@Param("keyword") String keyword);
+    SELECT * FROM user_admin_view
+    WHERE 
+        nickname LIKE CONCAT('%', #{keyword}, '%')
+        OR email_id LIKE CONCAT('%', #{keyword}, '%')
+        OR CAST(user_id AS CHAR) = #{keyword}
+    LIMIT #{size} OFFSET #{offset}
+    """)
+    List<UserAdminViewBean> searchUsersByKeyword(@Param("keyword") String keyword,
+                                                 @Param("offset") int offset,
+                                                 @Param("size") int size);
+
+    //검색된 회원 수 처리
+    @Select("""
+    SELECT COUNT(*) FROM user_admin_view
+    WHERE 
+        nickname LIKE CONCAT('%', #{keyword}, '%')
+        OR email_id LIKE CONCAT('%', #{keyword}, '%')
+        OR CAST(user_id AS CHAR) = #{keyword}
+    """)
+    int countUsersByKeyword(@Param("keyword") String keyword);
 
     //회원 단건 조회
     @Select("""
