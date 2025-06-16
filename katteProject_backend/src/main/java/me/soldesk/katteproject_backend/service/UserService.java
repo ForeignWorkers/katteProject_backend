@@ -78,6 +78,10 @@ public class UserService {
         return userMapper.getUserAddresses(Integer.parseInt(user_id));
     }
 
+    public List<UserAddressBean> getUserAddressDetail(String user_id, String id){
+        return userMapper.getUserAddressDetail(Integer.parseInt(user_id), Integer.parseInt(id));
+    }
+
     public UserAddressBean getUserMainAddress(String user_id) {
         return userMapper.getUserMainAddress(Integer.parseInt(user_id));
     }
@@ -87,6 +91,18 @@ public class UserService {
         userMapper.resetMainAddress(Integer.parseInt(user_id));         // 모두 false
         userMapper.setMainAddress(Integer.parseInt(user_id), Integer.parseInt(address_id)); // 선택된 것만 true
     }
+
+    public boolean editUserAddress(UserAddressBean userAddressBean) {
+        int updated = userMapper.editAddress(userAddressBean);
+        return updated > 0;
+    }
+
+    public boolean deleteUserAddress(int user_id, int address_id) {
+        int result = userMapper.deleteAddress(user_id, address_id);
+        return result > 0;
+    }
+
+
 
     @Transactional
     public int updateKatteMoney(UserKatteMoneyLogBean userKatteMoneyLogBean) {
