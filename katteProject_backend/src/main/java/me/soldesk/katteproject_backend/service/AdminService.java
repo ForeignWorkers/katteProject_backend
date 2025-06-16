@@ -103,8 +103,13 @@ public class AdminService {
     }
 
     //회원 검색
-    public List<UserAdminViewBean> searchUsers(String keyword) {
-        return adminMapper.searchUsersByKeyword(keyword);
+    public List<UserAdminViewBean> searchUsers(String keyword, int offset, int size) {
+        return adminMapper.searchUsersByKeyword(keyword, offset, size);
+    }
+
+    //회원 검색 수
+    public int searchUsersCount(String keyword) {
+        return adminMapper.countUsersByKeyword(keyword);
     }
 
     //회원 단건
