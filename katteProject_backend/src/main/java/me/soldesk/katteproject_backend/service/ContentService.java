@@ -26,6 +26,10 @@ public class ContentService {
         return contentMapper.getShortformByProductId(projectId, count, offset);
     }
 
+    public Integer getLatestShortformId() {
+        return contentMapper.getLatestShortformId();
+    }
+
     /**
      * 스타일을 저장하고, 바로 이어서 해시태그를 join 테이블에 연결해 줍니다.
      * ContentStyleBean#getId() 에는 addStyle() 호출 후 DB에서 자동 생성된 PK가 들어옵니다.

@@ -4,8 +4,7 @@ import common.bean.auction.AuctionDataBean;
 import common.bean.ecommerce.EcommerceOrderBean;
 import common.bean.product.*;
 import me.soldesk.katteproject_backend.mapper.ProductMapper;
-import common.bean.admin.InspectionProductViewBean;
-import common.bean.admin.RegisteredProductViewBean;
+import common.bean.admin.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,7 +106,17 @@ public class ProductService {
             throw new IllegalArgumentException("해당 사이즈 값은 유효하지 않습니다.");
         }
 
+        // 중복 사이즈 존재 여부 확인
+        if (productMapper.countSize(sizeBean.getProduct_id(), sizeBean.getSize_value()) > 0) {
+            throw new IllegalArgumentException("이미 등록된 사이즈입니다.");
+        }
+
+        // 유효성 통과 시 insert
         productMapper.insertProductSize(sizeBean);
+    }
+
+    public int countSize(int product_id, String size_value) {
+        return productMapper.countSize(product_id, size_value);
     }
 
     // 상품 카테고리 중 사이즈 등록이 허용된 카테고리 목록
@@ -132,6 +141,7 @@ public class ProductService {
         }
     }
 
+
     //판매 상품 등록
     public void registerPerSale(ProductPerSaleBean perSaleBean) {
         productMapper.insertPerSale(perSaleBean);
@@ -144,6 +154,11 @@ public class ProductService {
         checkResultBean.setSale_step(ProductCheckResultBean.SaleStep.INSPECTION);
 
         productMapper.insertCheckResult(checkResultBean);
+    }
+
+    // product_per_sale의 id를 반환
+    public Integer getLatestPerSaleId() {
+        return productMapper.getLatestPerSaleId();
     }
 
     //판매 완료 요청
@@ -179,6 +194,13 @@ public class ProductService {
     public List<RegisteredProductViewBean> getRegisteredProductList(int offset, int size) {
         return productMapper.getRegisteredProductList(offset, size);
     }
+
+    public Integer getSizeId(int productId, String sizeValue) {
+        return productMapper.getSizeId(productId, sizeValue);
+    }
+
+    //상품 최근 사이즈 id 조회
+    public Integer getLatestSizeId() {return productMapper.selectLatestSizeId();}
 
     //등록상품 수 조회
     public int getRegisteredProductCount() {

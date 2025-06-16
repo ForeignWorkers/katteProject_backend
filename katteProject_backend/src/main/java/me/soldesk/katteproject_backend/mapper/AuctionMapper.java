@@ -5,6 +5,7 @@ import common.bean.auction.AuctionBidLog;
 import common.bean.auction.AuctionWinResultBean;
 import org.apache.ibatis.annotations.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -13,39 +14,53 @@ public interface AuctionMapper {
     // 경매 데이터 등록
     @Insert("""
         INSERT INTO auction_data (
-            product_id,
-            product_size_id,
-            auction_size_value,
-            auction_start_time,
-            sale_period,
-            auction_end_time,
-            auction_insert_term,
-            start_price,
-            current_price,
-            instant_price,
-            is_instant_sale,
-            is_settle_amount
+        product_id,
+        product_size_id,
+        auction_size_value,
+        auction_start_time,
+        sale_period,
+        auction_end_time,
+        auction_insert_term,
+        start_price,
+        current_price,
+        instant_price,
+        is_instant_sale,
+        is_settle_amount
         ) VALUES (
-            #{product_id},
-            #{product_size_id},
-            #{auction_size_value},
-            NOW(),
-            #{sale_period},
-            #{auction_end_time},
-            #{auction_insert_term},
-            #{start_price},
-            #{current_price},
-            #{instant_price},
-            #{is_instant_sale},
-            #{is_settle_amount}
+        #{product_id},
+        #{product_size_id},
+        #{auction_size_value},
+        #{auction_start_time},
+        #{sale_period},
+        #{auction_end_time},
+        #{auction_insert_term},
+        #{start_price},
+        #{current_price},
+        #{instant_price},
+        #{is_instant_sale},
+        #{is_settle_amount}
         )
     """)
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insertAuctionData(AuctionDataBean auctionBean);
 
+    //옥션 시작시간 업데이트
+    @Update("""
+    UPDATE auction_data
+    SET auction_start_time = #{start}, auction_end_time = #{end}
+    WHERE id = #{auctionId}
+    """)
+    void updateAuctionTime(@Param("auctionId") int auctionId,
+                           @Param("start") Date start,
+                           @Param("end") Date end);
+
     // 경매 ID로 경매 정보 조회
     @Select("SELECT * FROM auction_data WHERE id = #{auctionId}")
     AuctionDataBean getAuctionById(@Param("auctionId") int auctionId);
+
+    //최신 경매 id 조회
+    @Select("SELECT id FROM auction_data ORDER BY id DESC LIMIT 1")
+    Integer getLatestAuctionId();
 
     // 입찰 로그 추가
     @Insert("""
@@ -141,4 +156,8 @@ public interface AuctionMapper {
     WHERE id = #{id}
 """)
     void updateAuctionSettlement(AuctionDataBean auction);
+
+    //경매 시간 세팅을 위한 mapper
+    @Select("SELECT sale_period FROM auction_data WHERE id = #{auctionId}")
+    String getSalePeriodByAuctionId(@Param("auctionId") int auctionId);
 }

@@ -1,11 +1,15 @@
 package me.soldesk.katteproject_backend.service;
 
+import common.bean.product.ProductCheckResultBean;
 import lombok.RequiredArgsConstructor;
 import me.soldesk.katteproject_backend.mapper.AdminMapper;
 import common.bean.user.UserBanBean;
 import common.bean.user.UserRestrictionBean;
 import common.bean.admin.InspectionProductViewBean;
 import common.bean.admin.UserAdminViewBean;
+import me.soldesk.katteproject_backend.mapper.AuctionMapper;
+import me.soldesk.katteproject_backend.mapper.ProductMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +22,11 @@ import java.util.List;
 public class AdminService {
 
     private final AdminMapper adminMapper;
+    private final AuctionService auctionService;
+    @Autowired
+    private ProductMapper productMapper;
+    @Autowired
+    private AuctionMapper auctionMapper;
 
     //정지 등록
     public void registerUserBan(UserBanBean userBanBean) {
@@ -105,7 +114,21 @@ public class AdminService {
 
     //검수 상태 변경(검수 성공)
     public void completeInspection(int checkResultId) {
+        // 1. 검수 상태 DB에 반영
         adminMapper.markInspectionComplete(checkResultId);
+
+        // 2. 검수 결과 → per_sale_id
+        ProductCheckResultBean result = productMapper.getCheckResultById(checkResultId);
+        int perSaleId = result.getPer_sale_id();
+
+        // 3. per_sale_id → auction_id
+        int auctionId = productMapper.getAuctionIdByPerSaleId(perSaleId);
+
+        // 4. auction_id → sale_period
+        String salePeriod = auctionMapper.getSalePeriodByAuctionId(auctionId);
+
+        // 5. 경매 시작 시간 설정
+        auctionService.markAuctionStart(auctionId, salePeriod);
     }
 
     //검수 상태 변경(조건 미달)
@@ -115,6 +138,7 @@ public class AdminService {
 
     //검수 리스트 조회
     public List<InspectionProductViewBean> getInspectionProductViewList(int offset, int size) {
+        if (offset < 0) offset = 0;
         return adminMapper.getInspectionProductViewList(offset, size);
     }
 
@@ -123,15 +147,36 @@ public class AdminService {
         return adminMapper.getInspectionTotalCount();
     }
 
-    //검수 데이터 삭제
+    // 판매 만료 , 검수 실패 모두 삭제 (컨트롤러 수동 요청용)
     @Transactional
     public int deleteExpiredOrFailedInspections() {
-        List<Integer> ids = adminMapper.getDeletableCheckResultIds();
-        for (int id : ids) {
-            adminMapper.deleteCheckResultById(id);
-            adminMapper.deletePerSaleByCheckResultId(id);
-        }
-        return ids.size();
+        int failCount = adminMapper.deleteInspectionFailedOld();
+        int expiredCount = adminMapper.deleteExpiredOld();
+        return failCount + expiredCount;
+    }
+
+    // 검수 실패만 삭제
+    public int deleteInspectionFailedOld() {
+        return adminMapper.deleteInspectionFailedOld();
+    }
+
+    // 판매 만료 후 3일 경과된 항목 삭제
+    public int deleteOldExpiredSales() {
+        return adminMapper.deleteExpiredOld();
+    }
+
+    //판매 기간만료 목록 수동 삭제 기간으로 조건변경
+    public void markAuctionForImmediateDeletion(int auctionId) {
+        adminMapper.forceExpireAuctionEndTime(auctionId);
+    }
+
+    //판매 만료 수동삭제
+    public int deleteExpiredSaleByAuctionId(int auctionId) {
+        return adminMapper.deleteExpiredByAuctionId(auctionId);
+    }
+    //판매 만료 상태 자동 갱신
+    public void updateExpiredSales() {
+        adminMapper.updateExpiredSales();
     }
 
 }

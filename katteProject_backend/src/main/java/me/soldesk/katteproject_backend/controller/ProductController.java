@@ -7,8 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import me.soldesk.katteproject_backend.service.ProductService;
-import common.bean.admin.InspectionProductViewBean;
-import common.bean.admin.RegisteredProductViewBean;
+import common.bean.admin.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -177,9 +176,45 @@ public class ProductController {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors().toString());
         }
+        //중복 사이즈 예외 캐치
+        try {
+            productService.registerProductSize(sizeBean);
+            return ResponseEntity.ok("상품 사이즈가 등록되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage()); //예외 메시지 포함
+        }
+    }
 
-        productService.registerProductSize(sizeBean);
-        return ResponseEntity.ok("상품 사이즈가 등록되었습니다.");
+    @GetMapping("/product/size/exists")
+    public ResponseEntity<Boolean> checkSizeExists(@RequestParam int product_id, @RequestParam String size_value) {
+        boolean exists = productService.countSize(product_id, size_value) > 0;
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/product/size/id")
+    @Operation(summary = "사이즈 ID 조회", description = "product_id와 size_value를 기반으로 해당 사이즈의 ID를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "404", description = "사이즈 정보 없음")
+    public ResponseEntity<Integer> getProductSizeId(
+            @RequestParam int product_id,
+            @RequestParam String size_value) {
+
+        Integer sizeId = productService.getSizeId(product_id, size_value);
+        if (sizeId != null) {
+            return ResponseEntity.ok(sizeId);
+        } else {
+            return ResponseEntity.status(404).body(null);
+        }
+    }
+
+
+    @GetMapping("/product/size/latest")
+    @Operation(summary = "최신 상품 사이즈 ID 조회", description = "가장 최근에 등록된 상품 사이즈의 ID를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "400", description = "요청 실패")
+    public ResponseEntity<Integer> getLatestProductSizeId() {
+        Integer latestSizeId = productService.getLatestSizeId(); // 서비스에서 가장 최신 사이즈 ID 반환
+        return ResponseEntity.ok(latestSizeId);
     }
 
     //상품 판매 등록
@@ -196,6 +231,15 @@ public class ProductController {
 
         productService.registerPerSale(bean);
         return ResponseEntity.ok("판매 상품이 등록되었습니다.");
+    }
+
+    @GetMapping("/product/sale/latest")
+    @Operation(summary = "최신 판매 등록 ID 조회", description = "가장 마지막에 등록된 product_per_sale의 ID를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "400", description = "조회 실패")
+    public ResponseEntity<Integer> getLatestPerSaleId() {
+        Integer latestId = productService.getLatestPerSaleId();
+        return ResponseEntity.ok(latestId);
     }
 
     @PostMapping("/product/inspection")

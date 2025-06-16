@@ -100,8 +100,8 @@ public interface AdminMapper {
     //검수 상태 변경(검수 성공)
     @Update("""
     UPDATE product_check_result
-    SET check_step = 'completed',
-        sale_step = 'on_sale',
+    SET check_step = 'COMPLETED',
+        sale_step = 'ON_SALE',
         check_end_day = NOW()
     WHERE id = #{check_result_id}
     """)
@@ -110,8 +110,8 @@ public interface AdminMapper {
     //검수 상태 변경(조건 미달)
     @Update("""
     UPDATE product_check_result
-    SET check_step = 'returned',
-        sale_step = 'inspection_fail',
+    SET check_step = 'RETURNED',
+        sale_step = 'INSPECTION_FAIL',
         check_end_day = NOW()
     WHERE id = #{check_result_id}
     """)
@@ -158,5 +158,64 @@ public interface AdminMapper {
     )
     """)
     void deletePerSaleByCheckResultId(int id);
+
+    //검수 실패 시 검수일로부터 3일 후 데이터 자동으로 삭제
+    @Delete("""
+    DELETE FROM product_check_result
+    WHERE sale_step = 'INSPECTION_FAIL'
+      AND check_end_day IS NOT NULL
+      AND check_end_day < NOW() - INTERVAL 3 DAY
+    """)
+    int deleteInspectionFailedOld();
+
+    //판매 기간 만료 시 판매 만료일로부터 3일 후 데이터 자동으로 삭제
+    @Delete("""
+    DELETE FROM product_per_sale
+    WHERE id IN (
+      SELECT * FROM (
+        SELECT ps.id
+        FROM product_per_sale ps
+        JOIN product_check_result pcr ON pcr.per_sale_id = ps.id
+        JOIN auction_data ad ON ps.auction_data_id = ad.id
+        WHERE pcr.sale_step = 'EXPIRED'
+          AND ad.auction_end_time < NOW() - INTERVAL 3 DAY
+      ) AS temp
+    )
+    """)
+    int deleteExpiredOld();
+
+    //판매 만료 상품 삭제 눌렀을때 3일전으로 땡겨서 바로 삭제처리 되도록 조건 업데이트
+    @Update("""
+    UPDATE auction_data
+    SET auction_end_time = NOW() - INTERVAL 3 DAY
+    WHERE id = #{auction_id}
+""")
+    void forceExpireAuctionEndTime(@Param("auction_id") int auctionId);
+
+    //수동 판매만료 삭제
+    @Delete("""
+        DELETE FROM product_per_sale
+        WHERE id IN (
+            SELECT ps.id
+            FROM product_per_sale ps
+            JOIN product_check_result pcr ON pcr.per_sale_id = ps.id
+            JOIN auction_data ad ON ps.auction_data_id = ad.id
+            WHERE ad.id = #{auction_id}
+              AND pcr.sale_step = 'EXPIRED'
+              AND ad.auction_end_time < NOW() - INTERVAL 3 DAY
+        )
+    """)
+    int deleteExpiredByAuctionId(@Param("auction_id") int auctionId);
+
+    //판매 기간 만료 자동 스캐줄링 쿼리
+    @Update("""
+        UPDATE product_check_result pcr
+        JOIN product_per_sale ps ON pcr.per_sale_id = ps.id
+        JOIN auction_data ad ON ps.auction_data_id = ad.id
+        SET pcr.sale_step = 'EXPIRED'
+        WHERE pcr.sale_step = 'ON_SALE'
+          AND ad.auction_end_time < NOW()
+    """)
+    void updateExpiredSales();
 
 }

@@ -170,4 +170,27 @@ public class AdminController {
         int count = adminService.deleteExpiredOrFailedInspections();
         return ResponseEntity.ok(String.format("총 %d개의 검수/판매 항목이 삭제되었습니다.", count));
     }
+
+    //옥션 id를 통한 판매 항목 삭제
+    @DeleteMapping("/inspection/delete_one")
+    @Operation(summary = "단일 판매 항목 삭제", description = "특정 auction_id에 해당하는 판매 항목을 삭제합니다 (조건: EXPIRED + 3일 경과).")
+    @ApiResponse(responseCode = "200", description = "삭제 성공")
+    @ApiResponse(responseCode = "400", description = "요청 실패")
+    public ResponseEntity<String> deleteSingleExpiredSale(@RequestParam("auction_id") int auctionId) {
+        int deleted = adminService.deleteExpiredSaleByAuctionId(auctionId);
+        if (deleted > 0) {
+            return ResponseEntity.ok(String.format("auction_id=%d → 판매 항목 삭제 완료", auctionId));
+        } else {
+            return ResponseEntity.badRequest().body(String.format("auction_id=%d → 삭제 조건 불충족 (EXPIRED + 3일 경과 필요)", auctionId));
+        }
+    }
+
+    @PatchMapping("/inspection/expire_now")
+    @Operation(summary = "만료 항목 즉시 삭제 예약", description = "EXPIRED 상태의 경매를 삭제 가능 상태로 즉시 조작합니다.")
+    @ApiResponse(responseCode = "200", description = "예약 성공")
+    @ApiResponse(responseCode = "400", description = "요청 실패")
+    public ResponseEntity<String> markExpiredAuctionForDelete(@RequestParam("auction_id") int auctionId) {
+        adminService.markAuctionForImmediateDeletion(auctionId);
+        return ResponseEntity.ok(String.format("auction_id=%d → 즉시 삭제 대상으로 설정됨", auctionId));
+    }
 }
