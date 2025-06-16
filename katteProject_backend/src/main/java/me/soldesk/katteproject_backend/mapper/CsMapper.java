@@ -205,10 +205,15 @@ public interface CsMapper {
     @Options(useGeneratedKeys = true, keyProperty = "standard_id")
     int addStandard(CsStandardBean csStandardBean);
 
-    // standard_category를 통해 검수 기준 상세 출력
-    @Select("SELECT * FROM cs_test_standard WHERE standard_category = #{standard_category}")
+    // standard_category를 통해 검수 기준 리스트를 출력
+    @Select("select * from cs_test_standard order by standard_category, create_at desc;")
     List<CsStandardBean> getStandard(
             @Param("standard_category") CsStandardBean.Standard_Category standard_category);
+
+    //standard_id를 통해 검수 기준 상세 출력
+    @Select(("SELECT * FROM cs_test_standard where standard_id = #{standard_id}"))
+    List<CsStandardBean> getStandardById(
+            @Param("standard_id") int standard_id);
 
     // 검수 기준 질문 수정
     @Update("update cs_test_standard " +

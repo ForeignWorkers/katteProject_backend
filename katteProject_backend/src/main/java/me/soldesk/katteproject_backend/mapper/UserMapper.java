@@ -64,7 +64,7 @@ public interface UserMapper {
 
     @Select("SELECT * FROM user_payment WHERE user_id = #{user_id}")
     UserPaymentBean getUserPaymentById(int user_id);
-
+    //주소 추가
     @Insert("""
         INSERT INTO user_address (
         user_id,
@@ -72,24 +72,35 @@ public interface UserMapper {
         phone_number,
         address_line01,
         address_line02,
-        is_main
+        is_main,
+        post_num
     ) VALUES (
         #{user_id},                              -- user_id (user_info 테이블에 존재하는 유저 ID)
         #{name},                       -- name
         #{phone_number},               -- phone_number
         #{address_line01}, -- address_line01
         #{address_line02},                 -- address_line02
-        #{is_main}                           -- is_main
+        #{is_main},                           -- is_main
+        #{post_num}
     );
     """)
     void addUserAddress(UserAddressBean userAddressBean);
 
+    //유저 id로 주소 조회
     @Select("""
             SELECT * FROM user_address
             WHERE user_id = #{user_id}
             """)
     List<UserAddressBean> getUserAddresses(int user_id);
 
+    //유저id, id로 주소 상세 조회
+    @Select("""
+            SELECT * FROM user_address
+            WHERE user_id = #{user_id} AND id = #{id}
+            """)
+    List<UserAddressBean> getUserAddressDetail(int user_id, int id);
+
+    //유저 id랑 메인 주소여부로 주소 조회
     @Select("""
         SELECT * FROM user_address
         WHERE user_id = #{user_id}
@@ -97,19 +108,40 @@ public interface UserMapper {
         """)
     UserAddressBean getUserMainAddress(int user_id);
 
+    //유저 id 받고 메인 주소 해제
     @Update("""
         UPDATE user_address
         SET is_main = FALSE
         WHERE user_id = #{user_id}
     """)
     void resetMainAddress(int user_id);
-
+    //주소id랑 유저id 받고 메인 주소 설정
     @Update("""
         UPDATE user_address
         SET is_main = TRUE
         WHERE id = #{address_id} AND user_id = #{user_id}
     """)
     void setMainAddress(int user_id, int address_id);
+
+    //유저 주소 변경
+    @Update("""
+    UPDATE user_address SET
+        name = #{name},
+        phone_number = #{phone_number},
+        address_line01 = #{address_line01},
+        address_line02 = #{address_line02},
+        post_num = #{post_num}
+        WHERE id = #{id} AND user_id = #{user_id}
+        """)
+    int editAddress(UserAddressBean userAddressBean);
+
+    //유저 주소 삭제
+    @Delete("""
+        DELETE FROM user_address
+        WHERE id = #{address_id} AND user_id = #{user_id}
+
+    """)
+    int deleteAddress(int user_id, int address_id);
 
     @Select("SELECT katte_money FROM user_payment WHERE user_id = #{user_id}")
     int selectKatteMoney(int user_id);

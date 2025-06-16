@@ -23,6 +23,12 @@ public class CsStandardService {
         return standardList;
     }
 
+    //단일 검수 기준 조회
+    public List<CsStandardBean> getStandard(int standard_id) {
+        List<CsStandardBean> standardList = csMapper.getStandardById(standard_id);
+        return standardList;
+}
+
     //검수 기준 수정
     public int updateStandard(CsStandardBean csStandardBean) {
         return csMapper.updateStandard(

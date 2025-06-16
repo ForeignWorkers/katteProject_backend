@@ -145,6 +145,13 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserAddress(user_id));
     }
 
+    @GetMapping("/user/address/detail")
+    @Operation(summary = "유저 주소 상세 조회", description = "유저의 상세 주소 리스트 반환")
+    public ResponseEntity<List<UserAddressBean>> getUserAddressDetail(@RequestParam String user_id,
+                                                                @RequestParam String id) {
+        return ResponseEntity.ok(userService.getUserAddressDetail(user_id, id));
+    }
+
     @GetMapping("/user/address/main")
     //API Docs
     @Operation(summary = "유저의 메인 주소 조회", description = "유저의 메인 주소 반환")
@@ -159,6 +166,32 @@ public class UserController {
                                                  @RequestParam String address_id) {
         userService.updateMainAddress(address_id, user_id);
         return ResponseEntity.ok("main 주소가 바뀌었습니다.");
+    }
+
+    @PatchMapping("/user/address/edit")
+    @Operation(summary = "유저의 주소 수정", description = "body로 id, user_id, name, phone_number, address_line01/02, post_num 다 필요함")
+    public ResponseEntity<String> updateUserAddress(@RequestBody UserAddressBean userAddressBean) {
+        boolean result = userService.editUserAddress(userAddressBean);
+        if (result) {
+            return ResponseEntity.ok("주소를 수정하였습니다.");
+        } else {
+            return ResponseEntity.badRequest().body("주소 수정에 실패했습니다.");
+        }
+    }
+
+    @DeleteMapping("/user/address/del")
+    @Operation(summary = "유저 주소 삭제")
+    public ResponseEntity<String> deleteAddress(
+            @RequestParam int user_id,
+            @RequestParam int address_id) {
+
+        boolean deleted = userService.deleteUserAddress(user_id, address_id);
+
+        if (deleted) {
+            return ResponseEntity.ok("주소가 정상적으로 삭제되었습니다.");
+        } else {
+            return ResponseEntity.badRequest().body("주소를 삭제하지 못했습니다.");
+        }
     }
 
     @PatchMapping("/user/katte")
