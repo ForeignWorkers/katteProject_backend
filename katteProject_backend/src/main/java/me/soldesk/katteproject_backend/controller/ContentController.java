@@ -3,6 +3,7 @@ package me.soldesk.katteproject_backend.controller;
 import common.bean.content.ContentShortformBean;
 import common.bean.content.ContentStyleBean;
 import common.bean.content.ContentStyleComment;
+import common.bean.product.ProductPerSaleBean;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import me.soldesk.katteproject_backend.service.ContentService;
@@ -197,12 +198,16 @@ public class ContentController {
     @PostMapping("/content/style/add_product_id")
     public ResponseEntity<Boolean> addProductId(@RequestParam int style_id, @RequestParam int product_id) {
         try {
-            System.out.println("SADSADA");
             contentService.insertStyleProductTag(style_id, product_id);
             return ResponseEntity.ok(true);
         }catch (Exception e) {
             System.out.println("스타일에 프로덕션 아이디 목록을 생성하는데 실패하였습니다." + e.getMessage());
             return ResponseEntity.ok(false);
         }
+    }
+
+    @GetMapping("/content/perSaleShortId")
+    public ResponseEntity<ProductPerSaleBean> getPerSaleShortId(@RequestParam int short_id) {
+            return ResponseEntity.ok(contentService.getProductPerSaleByShortId(short_id));
     }
 }

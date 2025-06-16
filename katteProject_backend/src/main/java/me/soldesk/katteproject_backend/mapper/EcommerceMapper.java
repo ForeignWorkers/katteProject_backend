@@ -203,8 +203,22 @@ SELECT EXISTS (
 
     // 유저 결제 이력 조회
     @Select("""
-SELECT * FROM ecommerce_payments WHERE user_id = #{user_id} ORDER BY paid_at DESC
-""")
+            SELECT * FROM ecommerce_payments WHERE user_id = #{user_id} ORDER BY paid_at DESC
+            """)
     List<EcommercePaymentBean> getPaymentHistoryByUserId(@Param("user_id") int user_id);
 
+    //일정 기간 결제 내역 조회하기
+    @Select("""
+        SELECT
+            product_id,
+            final_price,
+            DATE(ordered_at) AS ordered_at
+        FROM ecommerce_order
+        WHERE product_id = #{productId}
+        AND ordered_at >= #{fromDate}
+            """)
+    List<EcommerceTradeLookUp> getTradesByProductAndDate(
+            @Param("productId") int productId,
+            @Param("fromDate") LocalDateTime fromDate
+    );
 }

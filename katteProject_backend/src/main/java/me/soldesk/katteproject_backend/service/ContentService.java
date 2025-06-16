@@ -3,6 +3,7 @@ package me.soldesk.katteproject_backend.service;
 import common.bean.content.ContentShortformBean;
 import common.bean.content.ContentStyleBean;
 import common.bean.content.ContentStyleComment;
+import common.bean.product.ProductPerSaleBean;
 import me.soldesk.katteproject_backend.mapper.ContentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -153,7 +154,10 @@ public class ContentService {
     }
 
     public ContentShortformBean getShortOneRandom(){
-        return contentMapper.getRandomShort();
+        ContentShortformBean bean = contentMapper.getRandomShort();
+        contentMapper.incrementViewCount(bean.getId());
+        bean.setTotal_view(bean.getTotal_view() + 1);
+        return bean;
     }
 
     public List<ContentStyleBean> getRecentStyles(int page, int size) {
@@ -167,5 +171,9 @@ public class ContentService {
 
     public void insertStyleProductTag(int style_id, int product_id) {
         contentMapper.insertStyleProductTag(style_id, product_id);
+    }
+
+    public ProductPerSaleBean getProductPerSaleByShortId(int short_id) {
+        return contentMapper.getProductPerSaleUseShortId(short_id);
     }
 }

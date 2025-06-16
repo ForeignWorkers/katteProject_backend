@@ -5,9 +5,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import me.soldesk.katteproject_backend.service.EcommerceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -106,5 +108,12 @@ public class EcommerceController {
     public ResponseEntity<String> processSettlement(@RequestParam int auction_id) {
         ecommerceService.settleOrder(auction_id);
         return ResponseEntity.ok("정산 처리 완료");
+    }
+
+    @GetMapping("/trade")
+    public ResponseEntity<List<EcommerceTradeLookUp>> getEcommerceTrade(@RequestParam int product_id,
+                                                                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate) {
+        List<EcommerceTradeLookUp> getList = ecommerceService.getTradeLookUp(product_id, fromDate);
+        return ResponseEntity.ok(getList);
     }
 }

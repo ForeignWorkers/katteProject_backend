@@ -111,4 +111,8 @@ public class EcommerceService {
     public List<EcommerceOrderHistoryBean> getOrderHistory(int userId) {
         return ecommerceMapper.getOrderHistoryByUserId(userId);
     }
+
+    public List<EcommerceTradeLookUp> getTradeLookUp(int product_id, LocalDateTime formDate) {
+        return ecommerceMapper.getTradesByProductAndDate(product_id, formDate);
+    }
 }

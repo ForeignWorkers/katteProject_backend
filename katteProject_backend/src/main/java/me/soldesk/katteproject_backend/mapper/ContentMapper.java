@@ -3,6 +3,7 @@ package me.soldesk.katteproject_backend.mapper;
 import common.bean.content.ContentShortformBean;
 import common.bean.content.ContentStyleBean;
 import common.bean.content.ContentStyleComment;
+import common.bean.product.ProductPerSaleBean;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -242,9 +243,18 @@ public interface ContentMapper {
     @Select("SELECT * FROM content_shortform ORDER BY RAND() LIMIT 1")
     ContentShortformBean getRandomShort();
 
+    @Update("UPDATE content_shortform SET total_view = total_view + 1 WHERE id = #{id}")
+    void incrementViewCount(@Param("id") int id);
+
     @Insert("""
             INSERT INTO content_style_product_tag (style_id, product_id)
             VALUES (#{style_id},#{product_id})
             """)
     void insertStyleProductTag(int style_id, int product_id);
+
+    @Select("""
+            SELECT * FROM product_per_sale WHERE shortform_id = #{short_id};
+            """)
+    ProductPerSaleBean getProductPerSaleUseShortId(int short_id);
+
 }
