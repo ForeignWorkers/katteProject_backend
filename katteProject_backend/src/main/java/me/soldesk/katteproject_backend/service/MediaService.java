@@ -23,12 +23,18 @@ public class MediaService {
             String extension = getExtensionFromContentType(contentType);
             boolean isVideo = contentType != null && contentType.startsWith("video");
 
+            // postId가 "182_1"이면 폴더명은 "182"
+            String[] parts = postId.split("_");
+            String folderName = parts[0]; // "182"
+
             String folder = isVideo
                     ? "mp4" : isStyle ? "style" : "images";
 
-            Path saveDir = Paths.get(basePath, folder, isVideo ? "" : postId);
+            // 저장 경로 설정: media/images/182/
+            Path saveDir = Paths.get(basePath, folder, folderName);
             Files.createDirectories(saveDir);
 
+            // 파일 이름은 그대로 postId 기반
             String filename = (isVideo ? "short_" : "") + postId + extension;
             Path filePath = saveDir.resolve(filename);
 
