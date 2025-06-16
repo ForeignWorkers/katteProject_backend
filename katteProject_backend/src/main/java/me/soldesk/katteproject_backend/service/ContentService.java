@@ -164,4 +164,8 @@ public class ContentService {
     public List<ContentStyleBean> getRecentStylesByOffset(int size, int offset) {
         return contentMapper.getRecentStyles(size, offset);
     }
+
+    public void insertStyleProductTag(int style_id, int product_id) {
+        contentMapper.insertStyleProductTag(style_id, product_id);
+    }
 }

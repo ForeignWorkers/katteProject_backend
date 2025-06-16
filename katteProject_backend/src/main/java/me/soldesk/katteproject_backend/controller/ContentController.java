@@ -194,5 +194,15 @@ public class ContentController {
         return ResponseEntity.ok(list);
     }
 
-
+    @PostMapping("/content/style/add_product_id")
+    public ResponseEntity<Boolean> addProductId(@RequestParam int style_id, @RequestParam int product_id) {
+        try {
+            System.out.println("SADSADA");
+            contentService.insertStyleProductTag(style_id, product_id);
+            return ResponseEntity.ok(true);
+        }catch (Exception e) {
+            System.out.println("스타일에 프로덕션 아이디 목록을 생성하는데 실패하였습니다." + e.getMessage());
+            return ResponseEntity.ok(false);
+        }
+    }
 }

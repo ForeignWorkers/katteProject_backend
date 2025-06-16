@@ -241,4 +241,10 @@ public interface ContentMapper {
 
     @Select("SELECT * FROM content_shortform ORDER BY RAND() LIMIT 1")
     ContentShortformBean getRandomShort();
+
+    @Insert("""
+            INSERT INTO content_style_product_tag (style_id, product_id)
+            VALUES (#{style_id},#{product_id})
+            """)
+    void insertStyleProductTag(int style_id, int product_id);
 }
