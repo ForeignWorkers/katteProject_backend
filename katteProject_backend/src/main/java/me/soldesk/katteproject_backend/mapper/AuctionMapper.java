@@ -3,6 +3,7 @@ package me.soldesk.katteproject_backend.mapper;
 import common.bean.auction.AuctionDataBean;
 import common.bean.auction.AuctionBidLog;
 import common.bean.auction.AuctionWinResultBean;
+import common.bean.product.ProductSizeWithSellPriceBean;
 import org.apache.ibatis.annotations.*;
 
 import java.util.Date;
@@ -160,4 +161,28 @@ public interface AuctionMapper {
     //경매 시간 세팅을 위한 mapper
     @Select("SELECT sale_period FROM auction_data WHERE id = #{auctionId}")
     String getSalePeriodByAuctionId(@Param("auctionId") int auctionId);
+
+    // 해당 상품의 즉시 판매 중 최저가 조회
+    @Select("""
+    SELECT MIN(current_price)
+    FROM auction_data
+    WHERE product_id = #{product_id}            -- 특정 상품 ID에 대해
+      AND is_instant_sale = TRUE                -- 즉시 판매 등록된 것 중
+      AND is_settle_amount = FALSE              -- 아직 낙찰(정산)되지 않은 것만
+      AND auction_end_time > NOW()              -- 유효한 경매(마감되지 않은)
+""")
+    Integer getLowestSellPrice(@Param("product_id") int productId);  // 결과로 최저 가격 반환
+
+    // 사이즈별 최저 즉시 판매가 조회
+    @Select("""
+    SELECT auction_size_value, MIN(current_price) AS price
+    FROM auction_data
+    WHERE product_id = #{product_id}
+      AND is_instant_sale = TRUE
+      AND is_settle_amount = FALSE
+      AND auction_end_time > NOW()
+    GROUP BY auction_size_value
+    ORDER BY auction_size_value
+""")
+    List<ProductSizeWithSellPriceBean> getLowestSellPriceBySize(@Param("product_id") int productId);
 }

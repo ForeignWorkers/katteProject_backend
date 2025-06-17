@@ -6,6 +6,7 @@ import common.bean.product.*;
 import common.bean.admin.*;
 import org.apache.ibatis.annotations.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -86,6 +87,22 @@ public interface ProductMapper {
     // 단일 상품 조회: 상품 ID를 기준으로 product_info 테이블에서 상품 정보
     @Select("SELECT * FROM product_info WHERE product_id = #{product_id}")
     ProductInfoBean getProductById(@Param("product_id") int product_id);
+
+    // 최근 거래가 (가장 최신 주문 1건의 origin_price)
+    @Select("SELECT origin_price FROM ecommerce_order WHERE product_id = #{product_id} ORDER BY ordered_at DESC LIMIT 1")
+    Integer getRecentPrice(int product_id);
+
+    // 직전 거래가 (두 번째 최신 주문의 origin_price)
+    @Select("SELECT origin_price FROM ecommerce_order WHERE product_id = #{product_id} ORDER BY ordered_at DESC LIMIT 1 OFFSET 1")
+    Integer getPreviousPrice(int product_id);
+
+    // 직전 거래일 (두 번째 최신 주문의 ordered_at)
+    @Select("SELECT ordered_at FROM ecommerce_order WHERE product_id = #{product_id} ORDER BY ordered_at DESC LIMIT 1 OFFSET 1")
+    Date getPreviousDate(int product_id);
+
+    // 즉시 구매 최저가 (판매중인 auction_data 기준)
+    @Select("SELECT MIN(instant_price) FROM auction_data WHERE product_id = #{product_id}")
+    Integer getInstantPrice(int product_id);
 
     // 상품 사이즈별 최저가 조회
     @Select("""
