@@ -98,7 +98,11 @@ public class AdminService {
 
     //회원 리스트 조회
     public List<UserAdminViewBean> getUserList(int offset, int size, String filter) {
-        return adminMapper.findUserList(offset, size, filter);
+        if ("reported".equals(filter)) {
+            return adminMapper.getReportedUsers(offset, size);
+        } else {
+            return adminMapper.getAllUsers(offset, size);
+        }
     }
 
     //전체 회원 수

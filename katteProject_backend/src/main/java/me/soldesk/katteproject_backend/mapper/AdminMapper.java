@@ -82,6 +82,18 @@ public interface AdminMapper {
     @Select("SELECT COUNT(*) FROM user_admin_view")
     int getUserTotalCount();
 
+    //신필터
+    @Select("SELECT * FROM user_admin_view LIMIT #{size} OFFSET #{offset}")
+    List<UserAdminViewBean> getAllUsers(@Param("offset") int offset, @Param("size") int size);
+    //상태 처리 분기
+    @Select("""
+    SELECT * FROM user_admin_view
+    WHERE ban_status = '계정 정지' OR restriction_status IS NOT NULL
+    LIMIT #{size} OFFSET #{offset}
+""")
+    List<UserAdminViewBean> getReportedUsers(@Param("offset") int offset, @Param("size") int size);
+
+
     //회원 검색(페이징 처리 추가)
     @Select("""
     SELECT * FROM user_admin_view
