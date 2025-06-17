@@ -43,6 +43,15 @@ public class AdminController {
         );
     }
 
+    @GetMapping("/users/ban")
+    @Operation(summary = "회원 정지 여부 조회", description = "특정 회원이 정지 상태인지 여부를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<Boolean> isUserBanned(@RequestParam("user_id") int userId) {
+        boolean isBanned = adminService.isUserBanned(userId);
+        return ResponseEntity.ok(isBanned);
+    }
+
     @PostMapping("/users/restriction")
     @Operation(summary = "회원 제한 등록", description = "특정 회원에게 제한을 등록합니다.")
     @ApiResponse(responseCode = "200", description = "등록 성공")
@@ -85,6 +94,18 @@ public class AdminController {
         );
     }
 
+    @GetMapping("/users/restriction/check")
+    @Operation(summary = "특정 제한 여부 확인", description = "특정 회원이 특정 유형의 제한을 받고 있는지 여부를 확인합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<Boolean> checkUserRestriction(
+            @RequestParam("user_id") int userId,
+            @RequestParam("restriction_type") String restrictionType) {
+
+        boolean isRestricted = adminService.isUserRestricted(userId, restrictionType);
+        return ResponseEntity.ok(isRestricted);
+    }
+
     @GetMapping("/users/status")
     @Operation(summary = "회원 상태 조회", description = "회원의 정지 또는 제한 상태를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
@@ -112,6 +133,16 @@ public class AdminController {
     @ApiResponse(responseCode = "400", description = "파라미터 에러")
     public ResponseEntity<Integer> getUserTotalCount() {
         return ResponseEntity.ok(adminService.getUserTotalCount());
+    }
+
+    @GetMapping("/users/restrictions")
+    @Operation(summary = "유저 제한 목록 조회", description = "해당 유저의 현재 유효한 제한 리스트를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 오류")
+    public ResponseEntity<List<UserRestrictionBean>> getUserRestrictions(@RequestParam("user_id") int userId) {
+        System.out.println("💡 [백엔드] user_id 파라미터 수신: " + userId);
+        List<UserRestrictionBean> restrictions = adminService.getValidRestrictions(userId);
+        return ResponseEntity.ok(restrictions);
     }
 
     @GetMapping("/users/search")

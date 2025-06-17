@@ -43,6 +43,11 @@ public class AdminService {
         adminMapper.deleteUserBan(userId);
     }
 
+    //정지 조회
+    public boolean isUserBanned(int userId) {
+        return adminMapper.isUserBanned(userId);
+    }
+
     //제한 등록
     public void registerRestriction(UserRestrictionBean bean) {
         Date now = new Date();
@@ -66,6 +71,13 @@ public class AdminService {
     //제한 수정
     public void updateRestriction(int user_id, int stop_days) {
         adminMapper.updateUserRestriction(user_id, stop_days);
+    }
+
+    //상태 처리를 위한 조회
+    public boolean isUserRestricted(int userId, String restrictionType) {
+        List<UserRestrictionBean> restrictions = adminMapper.findAllValidRestrictionsByUserId(userId);
+        return restrictions.stream()
+                .anyMatch(r -> r.getRestriction_type().equalsIgnoreCase(restrictionType));
     }
 
     //유저 상태 조회
@@ -94,6 +106,11 @@ public class AdminService {
 
         //3. 아무 제한 없음
         return "정상";
+    }
+
+    //신고 회원 리스트 조회
+    public List<UserRestrictionBean> getValidRestrictions(int userId) {
+        return adminMapper.findAllValidRestrictionsByUserId(userId);
     }
 
     //회원 리스트 조회
