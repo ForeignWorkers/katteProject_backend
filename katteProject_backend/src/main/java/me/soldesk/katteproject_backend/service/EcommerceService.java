@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -71,6 +73,11 @@ public class EcommerceService {
 
     // 쿠폰 이력 추가
     public void assignCouponToUser(EcommerceCouponHistory history) {
+        if (history.getEnd_date() == null) {
+            LocalDateTime sixtyDaysLater = LocalDateTime.now().plusDays(60);
+            Date endDate = Date.from(sixtyDaysLater.atZone(ZoneId.systemDefault()).toInstant());
+            history.setEnd_date(endDate);
+        }
         ecommerceMapper.addCouponHistory(history);
     }
 
