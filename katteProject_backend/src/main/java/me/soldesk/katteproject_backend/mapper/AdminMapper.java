@@ -33,9 +33,13 @@ public interface AdminMapper {
             """)
     void insertUserRestriction(UserRestrictionBean bean);
 
+    //특정 제한 해제
+    @Delete("DELETE FROM user_restriction WHERE user_id = #{userId} AND restriction_type = #{restrictionType}")
+    void deleteRestrictionByType(@Param("userId") int userId, @Param("restrictionType") String restrictionType);
+
     //제한 해제
-    @Delete("DELETE FROM user_restriction WHERE user_id = #{user_id}")
-    void deleteUserRestriction(@Param("user_id") int user_id);
+    @Delete("DELETE FROM user_restriction WHERE user_id = #{userId}")
+    void deleteAllRestrictions(@Param("userId") int userId);
 
     //제한 수정
     @Update("""

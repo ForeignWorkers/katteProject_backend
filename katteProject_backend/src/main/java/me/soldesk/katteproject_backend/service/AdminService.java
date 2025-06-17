@@ -55,8 +55,12 @@ public class AdminService {
     }
 
     //제한 해제
-    public void deleteRestriction(int user_id) {
-        adminMapper.deleteUserRestriction(user_id);
+    public void deleteSpecificRestriction(int userId, String restrictionType) {
+        adminMapper.deleteRestrictionByType(userId, restrictionType);
+    }
+
+    public void deleteAllRestrictions(int userId) {
+        adminMapper.deleteAllRestrictions(userId);
     }
 
     //제한 수정

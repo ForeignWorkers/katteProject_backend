@@ -58,11 +58,17 @@ public class AdminController {
     @Operation(summary = "회원 제한 해제", description = "특정 회원의 제한을 해제합니다.")
     @ApiResponse(responseCode = "200", description = "등록 성공")
     @ApiResponse(responseCode = "400", description = "파라미터 에러")
-    public ResponseEntity<String> unrestrictUser(@RequestParam("user_id") int userId) {
-        adminService.deleteRestriction(userId);
-        return ResponseEntity.ok(
-                String.format("user_id=%d 의 유저 제한 해제 완료", userId)
-        );
+    public ResponseEntity<String> unrestrictUser(
+            @RequestParam("user_id") int userId,
+            @RequestParam(value = "restriction_type", required = false) String restrictionType
+    ) {
+        if (restrictionType != null) {
+            adminService.deleteSpecificRestriction(userId, restrictionType);
+            return ResponseEntity.ok(String.format("user_id=%d의 %s 제한 해제 완료", userId, restrictionType));
+        } else {
+            adminService.deleteAllRestrictions(userId);
+            return ResponseEntity.ok(String.format("user_id=%d 의 모든 제한 해제 완료", userId));
+        }
     }
 
     @PatchMapping("/users/restriction")
