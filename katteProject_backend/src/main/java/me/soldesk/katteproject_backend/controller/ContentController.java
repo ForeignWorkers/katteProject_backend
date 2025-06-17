@@ -169,6 +169,17 @@ public class ContentController {
         return ResponseEntity.ok(likedStyles);
     }
 
+    @GetMapping("/content/style/like/userAll")
+    //API Docs
+    @Operation(summary = "특정 유저가 좋아요 누른 스타일 조회", description = "특정 유저가 좋아요 누른 스타일을 조회 (리스트)")
+    @ApiResponse(responseCode = "200", description = "성공")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<List<ContentStyleBean>> getLikedStylesAll(@RequestParam int user_id) {
+
+        List<ContentStyleBean> likedStyles = contentService.getStyleByUserAll(user_id);
+        return ResponseEntity.ok(likedStyles);
+    }
+
     @PatchMapping("/content/short/like")
     //API Docs
     @Operation(summary = "숏폼 좋아요 토글", description = "특정 숏폼에 대한 좋아요 토글")

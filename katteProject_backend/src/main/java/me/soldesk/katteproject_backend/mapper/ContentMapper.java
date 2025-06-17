@@ -147,6 +147,11 @@ public interface ContentMapper {
     @Select(("SELECT * FROM content_stylecomment WHERE style_id = #{styleId}"))
     List<ContentStyleComment> getStyleCommentByStyleId(int styleId);
 
+    @Select("""
+            SELECT * FROM content_style WHERE user_id = #{user_id}
+            """)
+    List<ContentStyleBean> getStyleByUserIdALL(@Param("user_id") int user_id);
+
     @Insert("INSERT INTO content_stylecomment (style_id, user_id, recomment_id, content, create_at)\n" +
             "VALUES (#{style_id}, #{user_id}, #{recomment_id}, #{content}, #{create_at})")
     void addStyleComment(ContentStyleComment contentStyleComment);

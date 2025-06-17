@@ -181,4 +181,8 @@ public class ContentService {
     public List<ContentStyleProductJoinBean> getProductPerSaleByProductId(int product_id) {
         return contentMapper.getStyleProductTagById(product_id);
     }
+
+    public List<ContentStyleBean> getStyleByUserAll(int user_id) {
+        return contentMapper.getStyleByUserIdALL(user_id);
+    }
 }
