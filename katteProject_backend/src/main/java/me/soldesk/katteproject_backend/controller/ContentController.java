@@ -3,6 +3,7 @@ package me.soldesk.katteproject_backend.controller;
 import common.bean.content.ContentShortformBean;
 import common.bean.content.ContentStyleBean;
 import common.bean.content.ContentStyleComment;
+import common.bean.content.ContentStyleProductJoinBean;
 import common.bean.product.ProductPerSaleBean;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -208,6 +209,11 @@ public class ContentController {
 
     @GetMapping("/content/perSaleShortId")
     public ResponseEntity<ProductPerSaleBean> getPerSaleShortId(@RequestParam int short_id) {
-            return ResponseEntity.ok(contentService.getProductPerSaleByShortId(short_id));
+        return ResponseEntity.ok(contentService.getProductPerSaleByShortId(short_id));
+    }
+
+    @GetMapping("/content/styleProductJoin")
+    public ResponseEntity<List<ContentStyleProductJoinBean>> getStyleProductJoin(@RequestParam int product_id) {
+        return ResponseEntity.ok(contentService.getProductPerSaleByProductId(product_id));
     }
 }

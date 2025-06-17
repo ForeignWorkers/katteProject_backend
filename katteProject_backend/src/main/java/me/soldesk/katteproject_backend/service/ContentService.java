@@ -3,6 +3,7 @@ package me.soldesk.katteproject_backend.service;
 import common.bean.content.ContentShortformBean;
 import common.bean.content.ContentStyleBean;
 import common.bean.content.ContentStyleComment;
+import common.bean.content.ContentStyleProductJoinBean;
 import common.bean.product.ProductPerSaleBean;
 import me.soldesk.katteproject_backend.mapper.ContentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,5 +176,9 @@ public class ContentService {
 
     public ProductPerSaleBean getProductPerSaleByShortId(int short_id) {
         return contentMapper.getProductPerSaleUseShortId(short_id);
+    }
+
+    public List<ContentStyleProductJoinBean> getProductPerSaleByProductId(int product_id) {
+        return contentMapper.getStyleProductTagById(product_id);
     }
 }

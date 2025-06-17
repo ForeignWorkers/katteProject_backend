@@ -3,6 +3,7 @@ package me.soldesk.katteproject_backend.mapper;
 import common.bean.content.ContentShortformBean;
 import common.bean.content.ContentStyleBean;
 import common.bean.content.ContentStyleComment;
+import common.bean.content.ContentStyleProductJoinBean;
 import common.bean.product.ProductPerSaleBean;
 import org.apache.ibatis.annotations.*;
 
@@ -257,4 +258,8 @@ public interface ContentMapper {
             """)
     ProductPerSaleBean getProductPerSaleUseShortId(int short_id);
 
+    @Select("""
+            SELECT * FROM content_style_product_tag WHERE product_id = #{product_id}
+            """)
+    List<ContentStyleProductJoinBean> getStyleProductTagById(int product_id);
 }
