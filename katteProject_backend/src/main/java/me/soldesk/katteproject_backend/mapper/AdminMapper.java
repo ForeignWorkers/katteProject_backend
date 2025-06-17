@@ -50,6 +50,10 @@ public interface AdminMapper {
             """)
     void updateUserRestriction(@Param("user_id") int user_id, @Param("stop_days") int stop_days);
 
+    //user_id 로 조회
+    @Select("SELECT COUNT(*) > 0 FROM user_ban WHERE user_id = #{user_id}")
+    boolean isUserBanned(@Param("user_id") int userId);
+
     //유저 상태 조회(정지)
     @Select("SELECT * FROM user_ban WHERE user_id = #{user_id} LIMIT 1")
     UserBanBean findBanByUserId(@Param("user_id") int user_id);
@@ -85,12 +89,13 @@ public interface AdminMapper {
     //신필터
     @Select("SELECT * FROM user_admin_view LIMIT #{size} OFFSET #{offset}")
     List<UserAdminViewBean> getAllUsers(@Param("offset") int offset, @Param("size") int size);
+
     //상태 처리 분기
     @Select("""
     SELECT * FROM user_admin_view
     WHERE ban_status = '계정 정지' OR restriction_status IS NOT NULL
     LIMIT #{size} OFFSET #{offset}
-""")
+    """)
     List<UserAdminViewBean> getReportedUsers(@Param("offset") int offset, @Param("size") int size);
 
 
