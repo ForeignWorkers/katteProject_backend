@@ -164,7 +164,7 @@ public class UserController {
     @Operation(summary = "유저의 메인 변경", description = "유저의 메인 주소 반환")
     public ResponseEntity<String> setMainAddress(@RequestParam String user_id,
                                                  @RequestParam String address_id) {
-        userService.updateMainAddress(address_id, user_id);
+        userService.updateMainAddress(user_id, address_id);
         return ResponseEntity.ok("main 주소가 바뀌었습니다.");
     }
 

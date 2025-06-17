@@ -86,10 +86,24 @@ public class UserService {
         return userMapper.getUserMainAddress(Integer.parseInt(user_id));
     }
 
-    @Transactional
+/*    @Transactional
     public void updateMainAddress(String user_id, String address_id) {
         userMapper.resetMainAddress(Integer.parseInt(user_id));         // 모두 false
         userMapper.setMainAddress(Integer.parseInt(user_id), Integer.parseInt(address_id)); // 선택된 것만 true
+    }*/
+    @Transactional
+    public void updateMainAddress(String user_id, String address_id) {
+        System.out.println(">> updateMainAddress 실행");
+        System.out.println("user_id = " + user_id + ", address_id = " + address_id);
+
+        int uid = Integer.parseInt(user_id);
+        int aid = Integer.parseInt(address_id);
+
+        userMapper.resetMainAddress(uid);
+        System.out.println("resetMainAddress 실행 완료");
+
+        userMapper.setMainAddress(uid, aid);
+        System.out.println("setMainAddress 실행 완료");
     }
 
     public boolean editUserAddress(UserAddressBean userAddressBean) {
