@@ -86,10 +86,10 @@ public interface UserMapper {
     """)
     void addUserAddress(UserAddressBean userAddressBean);
 
-    //유저 id로 주소 조회
+    //유저 id로 주소 조회 (Main주소가 아닌 애만 나옴.)
     @Select("""
             SELECT * FROM user_address
-            WHERE user_id = #{user_id}
+            WHERE user_id = #{user_id} AND is_main = 0
             """)
     List<UserAddressBean> getUserAddresses(int user_id);
 
