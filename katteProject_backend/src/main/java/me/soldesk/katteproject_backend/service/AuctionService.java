@@ -5,6 +5,7 @@ import common.bean.auction.AuctionBidLog;
 import common.bean.auction.AuctionDataBean;
 import common.bean.auction.AuctionWinResultBean;
 import common.bean.ecommerce.EcommerceOrderBean;
+import common.bean.product.ProductSizeWithSellPriceBean;
 import common.util.*;
 import me.soldesk.katteproject_backend.mapper.AuctionMapper;
 import me.soldesk.katteproject_backend.mapper.ProductMapper;
@@ -160,5 +161,15 @@ public class AuctionService {
     // [로직] 경매 낙찰 상태 갱신
     public void markAuctionAsSettled(AuctionDataBean auction) {
         auctionMapper.updateAuctionSettlement(auction);
+    }
+
+    // Mapper에서 즉시 판매 최저가 조회 후 반환
+    public Integer getLowestSellPrice(int productId) {
+        return auctionMapper.getLowestSellPrice(productId);
+    }
+
+    // 상품 ID에 해당하는 사이즈별 최저 즉시 판매가 조회
+    public List<ProductSizeWithSellPriceBean> getLowestSellPriceBySize(int productId) {
+        return auctionMapper.getLowestSellPriceBySize(productId);
     }
 }

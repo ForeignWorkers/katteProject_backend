@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import me.soldesk.katteproject_backend.service.AuctionService;
+
+import common.bean.product.ProductSizeWithSellPriceBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -141,6 +143,20 @@ public class AuctionController {
 
         int orderId = auctionService.generateOrderFromAuction(result);
         return ResponseEntity.ok(Map.of("order_id", orderId));
+    }
+
+    // [GET] /auction/lowest-sell-price?product_id=xxx 형태로 요청 시 응답
+    @GetMapping("auction/lowest-sell-price")
+    public ResponseEntity<Integer> getLowestSellPrice(@RequestParam int product_id) {
+        return ResponseEntity.ok(auctionService.getLowestSellPrice(product_id)); // 응답 본문에 최저가 포함
+    }
+
+    // 사이즈별 최저 즉시 판매가를 반환하는 API
+    @GetMapping("/auction/lowest-sell-price/size")
+    public ResponseEntity<List<ProductSizeWithSellPriceBean>> getLowestSellPriceBySize(
+            @RequestParam("product_id") int productId
+    ) {
+        return ResponseEntity.ok(auctionService.getLowestSellPriceBySize(productId));
     }
 
 }

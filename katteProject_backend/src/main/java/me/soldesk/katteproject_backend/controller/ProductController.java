@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import me.soldesk.katteproject_backend.service.ProductService;
 import common.bean.admin.*;
+import common.bean.product.ProductPriceSummaryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -70,6 +71,16 @@ public class ProductController {
     @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음")
     public ResponseEntity<List<ProductSizeWithPriceBean>> getSizeOptionsWithPrices(@RequestParam int product_id) {
         List<ProductSizeWithPriceBean> result = productService.getSizeOptionsWithPrices(product_id);
+        return ResponseEntity.ok(result);
+    }
+
+    // 상품 가격 요약 정보 반환
+    @GetMapping("/product/price-summary")
+    @Operation(summary = "상품 가격 요약 정보 조회", description = "상품 ID에 대해 최근 거래가, 직전 거래가, 거래일, 즉시 구매 최저가 등을 포함한 가격 요약 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "404", description = "상품 정보를 찾을 수 없음")
+    public ResponseEntity<ProductPriceSummaryBean> getPriceSummary(@RequestParam("product_id") int productId) {
+        ProductPriceSummaryBean result = productService.getProductPriceSummary(productId);
         return ResponseEntity.ok(result);
     }
 

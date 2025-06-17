@@ -5,10 +5,12 @@ import common.bean.ecommerce.EcommerceOrderBean;
 import common.bean.product.*;
 import me.soldesk.katteproject_backend.mapper.ProductMapper;
 import common.bean.admin.*;
+import common.bean.product.ProductPriceSummaryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +37,37 @@ public class ProductService {
     // 상품 단건 조회
     public ProductInfoBean getProductById(int productId) {
         return productMapper.getProductById(productId);
+    }
+
+    public ProductPriceSummaryBean getProductPriceSummary(int productId) {
+        ProductPriceSummaryBean bean = new ProductPriceSummaryBean();
+
+        // 최근 거래가
+        Integer recent = productMapper.getRecentPrice(productId);
+        bean.setPrice(recent);
+
+        // 직전 거래가
+        Integer prev = productMapper.getPreviousPrice(productId);
+        bean.setPrevious_price(prev);
+
+        // 직전 거래일
+        Date date = productMapper.getPreviousDate(productId);
+        bean.setPrevious_date(date);
+
+        // 가격 차이
+        if (recent != null && prev != null) {
+            bean.setDiff_amount(recent - prev);
+
+            // 변동률
+            double percent = ((recent - prev) / (double) prev) * 100;
+            bean.setDiff_percent(Math.round(percent * 10) / 10.0);
+        }
+
+        // 즉시 구매 최저가
+        Integer instant = productMapper.getInstantPrice(productId);
+        bean.setInstant_price(instant);
+
+        return bean;
     }
 
     // 사이즈별 최저 즉시판매가 조회
