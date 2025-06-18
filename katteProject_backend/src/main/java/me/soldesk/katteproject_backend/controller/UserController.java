@@ -203,10 +203,11 @@ public class UserController {
     }
 
     @PostMapping("/user/katte/refund")
-    ///API Docs
-    @Operation(summary = "katte 머니 환불 요청", description = "환불 요청 서 생성")
-    public ResponseEntity<String> addKatteMoneyRefund(@RequestBody UserKatteMoneyRefundBean userKatteMoneyRefundBean) {
-        userService.addKatteMoneyrefund(userKatteMoneyRefundBean);
+    @Operation(summary = "katte 머니 환불 요청", description = "환불 요청 후 잔액 차감 및 로그 기록")
+    @ApiResponse(responseCode = "200", description = "환불 요청 완료")
+    @ApiResponse(responseCode = "400", description = "파라미터 에러")
+    public ResponseEntity<String> addKatteMoneyRefund(@RequestBody UserKatteMoneyRefundBean bean) {
+        userService.addKatteMoneyrefund(bean);
         return ResponseEntity.ok("환불 요청서 생성 완료");
     }
 
@@ -217,13 +218,13 @@ public class UserController {
     }
 
     @PatchMapping("/user/katte/refund")
-    ///API Docs
     @Operation(summary = "katte 머니 환불 상태 업데이트", description = "환불서의 상태 업데이트")
-    public ResponseEntity<String> updateKatteMoneyRefund(@RequestParam UserKatteMoneyRefundBean.status status,
-                                                         @RequestParam int refund_id){
+    public ResponseEntity<String> updateKatteMoneyRefund(@RequestParam String status,
+                                                         @RequestParam int refund_id) {
         userService.updateKatteMoneyRefund(status, refund_id);
         return ResponseEntity.ok(String.format("%d의 환불서의 상태가 %s로 업데이트 되었습니다.", refund_id, status));
     }
+
 
     @PostMapping("/user/terms")
     public ResponseEntity<String> addUserTerms(@RequestBody Map<String,String> termData) {

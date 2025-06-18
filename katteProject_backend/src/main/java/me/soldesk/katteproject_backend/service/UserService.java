@@ -152,15 +152,31 @@ public class UserService {
         return updatedBalance;
     }
 
-    public void addKatteMoneyrefund(UserKatteMoneyRefundBean userKatteMoneyRefundBean) {
-        userMapper.addKatteMoneyRefund(userKatteMoneyRefundBean);
+    public void addKatteMoneyrefund(UserKatteMoneyRefundBean bean) {
+        //1.환불 요청 기록
+        userMapper.addKatteMoneyRefund(bean);
+
+        //2.잔액 차감
+        userMapper.subtractKatteMoney(bean.getUser_id(), bean.getAmount());
+
+        //3.로그 기록
+        UserKatteMoneyLogBean logBean = new UserKatteMoneyLogBean();
+        logBean.setUser_id(bean.getUser_id());
+        logBean.setChange_amount(-bean.getAmount()); // 마이너스로 기록
+        logBean.setReason(UserKatteMoneyLogBean.reason.REFUNDED);
+        userMapper.addKatteMoneyLog(logBean);
+
+        int currentMoney = userMapper.selectKatteMoney(bean.getUser_id());
+        if (bean.getAmount() > currentMoney) {
+            throw new IllegalArgumentException("보유 금액 초과 환불 요청");
+        }
     }
 
     public List<UserKatteMoneyRefundBean> getKatteMoneyRefund(int user_id) {
         return userMapper.getKatteMoneyRefunds(user_id);
     }
 
-    public void updateKatteMoneyRefund(UserKatteMoneyRefundBean.status status, int refund_id) {
+    public void updateKatteMoneyRefund(String status, int refund_id) {
         userMapper.updateKatteMoneyRefund(status, refund_id);
     }
 
@@ -175,4 +191,5 @@ public class UserService {
     public Boolean getUserByEmail(String email_id) {
         return userMapper.getUserByEmail(email_id) != null;
     }
+
 }
