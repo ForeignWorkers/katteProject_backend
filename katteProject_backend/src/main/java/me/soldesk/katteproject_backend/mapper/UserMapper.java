@@ -155,15 +155,15 @@ public interface UserMapper {
     void addKatteMoneyLog(UserKatteMoneyLogBean userKatteMoneyLogBean);
 
     @Insert("INSERT INTO user_katte_money_refund " +
-            "(user_id, amount, account_number, bank_type, status) " +
-            "VALUES (#{user_id}, #{amount}, #{account_number}, #{bank_type}, #{status})")
+            "(user_id, amount, account_number, bank_type) " +
+            "VALUES (#{user_id}, #{amount}, #{account_number}, #{bank_type})")
     void addKatteMoneyRefund(UserKatteMoneyRefundBean userKatteMoneyRefundBean);
 
     @Select("SELECT * FROM user_katte_money_refund WHERE user_id = #{user_id}")
     List<UserKatteMoneyRefundBean> getKatteMoneyRefunds(int user_id);
 
     @Update("UPDATE user_katte_money_refund SET status = #{status} WHERE id = #{refund_id}")
-    void updateKatteMoneyRefund(UserKatteMoneyRefundBean.status status, int refund_id);
+    void updateKatteMoneyRefund(@Param("status") String status, @Param("refund_id") int refund_id);
 
     @Insert("""
         INSERT INTO user_agreeterms (
@@ -189,4 +189,10 @@ public interface UserMapper {
             SELECT * FROM user_info WHERE email_id = #{email_id}
             """)
     UserBean getUserByEmail(String email_id);
+
+
+    @Update("UPDATE user_payment SET katte_money = katte_money - #{amount} WHERE user_id = #{userId}")
+    void subtractKatteMoney(@Param("userId") int userId, @Param("amount") int amount);
+
+
 }

@@ -37,7 +37,7 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     //common-lib
-    implementation 'com.github.ForeignWorkers:katteProject_common_lib:1.0.78'
+    implementation 'com.github.ForeignWorkers:katteProject_common_lib:1.0.86'
 
     //swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
