@@ -5,6 +5,7 @@ import common.bean.ecommerce.EcommerceCouponHistory;
 import common.bean.ecommerce.EcommerceOrderBean;
 import common.bean.ecommerce.EcommerceSettlementLogBean;
 import common.bean.ecommerce.*;
+import common.bean.product.ProductInfoBean;
 import org.apache.ibatis.annotations.*;
 
 import java.time.LocalDateTime;
@@ -221,4 +222,25 @@ SELECT EXISTS (
             @Param("productId") int productId,
             @Param("fromDate") LocalDateTime fromDate
     );
+
+    @Select("""
+        SELECT
+               id,
+               product_id,
+               product_base_id,
+               model_code,
+               category,
+               detail_category,
+               product_name,
+               product_name_kor,
+               product_desc,
+               brand_name,
+               release_date,
+               release_price
+        FROM
+               product_info
+        WHERE
+            product_id = #{product_id}
+    """)
+    ProductInfoBean getProductInfoByProductId(int product_id);
 }

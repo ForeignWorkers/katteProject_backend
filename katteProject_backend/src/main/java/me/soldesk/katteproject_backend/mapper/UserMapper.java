@@ -1,5 +1,6 @@
 package me.soldesk.katteproject_backend.mapper;
 
+import common.bean.product.ProductBrandLikeBean;
 import common.bean.user.*;
 import org.apache.ibatis.annotations.*;
 
@@ -193,6 +194,28 @@ public interface UserMapper {
 
     @Update("UPDATE user_payment SET katte_money = katte_money - #{amount} WHERE user_id = #{userId}")
     void subtractKatteMoney(@Param("userId") int userId, @Param("amount") int amount);
+
+    //관심 브랜드
+    @Select("select * from product_brand_like where user_id = #{user_id} order by id desc;")
+    List<ProductBrandLikeBean> getProductBrandLike(@Param("user_id") Integer user_id);
+
+    //관심 브랜드 id로 엮어서 관련 정보 뽑아오기
+    @Select("""
+            SELECT
+              b.id AS id,
+              b.brand_name,
+              b.brand_desc,
+              b.brand_icon_url,
+              b.brand_like_count,
+              l.created_at
+            FROM
+              product_brand_like AS l
+            JOIN
+              product_brand AS b ON l.brand_id = b.id
+            WHERE
+              l.user_id = 33;
+    """)
+    List<ProductBrandLikeBean> selectLikeBrandByUserId(@Param("user_id") int user_id);
 
 
 }

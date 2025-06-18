@@ -1,6 +1,7 @@
 package me.soldesk.katteproject_backend.controller;
 
 import common.bean.ecommerce.*;
+import common.bean.product.ProductInfoBean;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import me.soldesk.katteproject_backend.service.EcommerceService;
@@ -58,6 +59,11 @@ public class EcommerceController {
     public ResponseEntity<EcommerceOrderDetailBean> getOrderDetail(@RequestParam int order_id) {
         EcommerceOrderDetailBean detail = ecommerceService.getOrderDetail(order_id);
         return ResponseEntity.ok(detail);
+    }
+
+    @GetMapping("/order/history/detail")
+    public ProductInfoBean getProductInfo(@RequestParam("product_id") int product_id) {
+        return ecommerceService.getProductInfoByProductId(product_id);
     }
 
     @Operation(summary = "주문 이력 조회", description = "해당 유저의 전체 주문 이력을 조회합니다.")
