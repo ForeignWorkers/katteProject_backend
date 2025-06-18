@@ -5,10 +5,12 @@ import common.bean.content.ContentStyleBean;
 import common.bean.content.ContentStyleComment;
 import common.bean.content.ContentStyleProductJoinBean;
 import common.bean.product.ProductPerSaleBean;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import me.soldesk.katteproject_backend.mapper.ContentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -184,5 +186,19 @@ public class ContentService {
 
     public List<ContentStyleBean> getStyleByUserAll(int user_id) {
         return contentMapper.getStyleByUserIdALL(user_id);
+    }
+
+    public List<Integer> getStyleProductTags(int style_id){
+        List<Integer> list = new ArrayList<>();
+
+        for (ContentStyleProductJoinBean bean : contentMapper.getStyleProductTagByStyleId(style_id)){
+            list.add(bean.getProduct_id());
+        }
+
+        return list;
+    }
+
+    public boolean isExitLike(int style_id, int user_id) {
+        return contentMapper.countStyleLike(style_id, user_id) > 0;
     }
 }

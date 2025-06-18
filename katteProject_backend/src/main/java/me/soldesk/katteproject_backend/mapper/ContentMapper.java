@@ -267,4 +267,14 @@ public interface ContentMapper {
             SELECT * FROM content_style_product_tag WHERE product_id = #{product_id}
             """)
     List<ContentStyleProductJoinBean> getStyleProductTagById(int product_id);
+
+    @Select("""
+            SELECT * FROM content_style_product_tag WHERE style_id = #{style_id}
+            """)
+    List<ContentStyleProductJoinBean> getStyleProductTagByStyleId(int style_id);
+
+    @Select("""
+            SELECT COUNT(*) FROM content_stylelike WHERE style_id = #{style_id} AND user_id = #{user_id}
+            """)
+    int countStyleLike(int style_id, int user_id);
 }

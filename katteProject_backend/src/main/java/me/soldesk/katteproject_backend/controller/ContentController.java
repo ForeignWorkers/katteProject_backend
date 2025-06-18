@@ -227,4 +227,15 @@ public class ContentController {
     public ResponseEntity<List<ContentStyleProductJoinBean>> getStyleProductJoin(@RequestParam int product_id) {
         return ResponseEntity.ok(contentService.getProductPerSaleByProductId(product_id));
     }
+
+    @GetMapping("/content/style/getTagProduct")
+    public ResponseEntity<List<Integer>> getTagProduct(@RequestParam int style_id) {
+        return ResponseEntity.ok(contentService.getStyleProductTags(style_id));
+    }
+
+    @GetMapping("/content/isStyleLikeExist")
+    public ResponseEntity<Boolean> isStyleLikeExist(@RequestParam int style_id,
+                                                    @RequestParam int user_id) {
+        return ResponseEntity.ok(contentService.isExitLike(style_id, user_id));
+    }
 }
