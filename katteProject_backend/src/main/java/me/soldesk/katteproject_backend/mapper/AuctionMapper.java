@@ -134,6 +134,20 @@ public interface AuctionMapper {
     """)
     boolean isAuctionExpired(@Param("auction_id") int auction_id);
 
+    //거래 사이즈랑 프로덕트id로 마감기한 조회
+    @Select("""
+    SELECT auction_end_time
+    FROM auction_data
+    WHERE product_id = #{product_id}
+      AND auction_size_value = #{auction_size_value}
+    ORDER BY auction_end_time DESC
+    LIMIT 1
+""")
+    Date getAuctionEndTime(
+            @Param("product_id") int productId,
+            @Param("auction_size_value") String auctionSizeValue
+    );
+
     // 낙찰자 존재 여부 판단 (입찰 기록 존재 여부 기준)
     @Select("""
         SELECT COUNT(*) > 0

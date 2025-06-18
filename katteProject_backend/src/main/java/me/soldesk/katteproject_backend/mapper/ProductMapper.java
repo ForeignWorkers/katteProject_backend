@@ -106,22 +106,20 @@ public interface ProductMapper {
 
     // 상품 사이즈별 최저가 조회
     @Select("""
-    SELECT
-    ps.size_value AS auction_size_value,
-    MIN(ad.instant_price) AS price
-    FROM
-    product_size ps
-    LEFT JOIN
-    auction_data ad
-    ON
-    ps.id = ad.product_size_id
-    AND ad.is_instant_sale = true
-    WHERE
-    ps.product_id = #{product_id}
-    GROUP BY
-    ps.size_value
-    ORDER BY
-    ps.size_value
+SELECT
+  ps.size_value AS auction_size_value,
+  MIN(ad.instant_price) AS price
+FROM
+  product_size ps
+LEFT JOIN
+  auction_data ad ON ps.id = ad.product_size_id
+WHERE
+  ps.product_id = #{product_id}
+  AND (ad.is_instant_sale = true OR ad.id IS NULL)
+GROUP BY
+  ps.size_value
+ORDER BY
+  ps.size_value
 """)
     List<ProductSizeWithPriceBean> getSizeOptionsWithPrices(@Param("product_id") int product_id);
 
@@ -194,27 +192,31 @@ public interface ProductMapper {
         pi.product_id,
         pi.product_name,
         pi.brand_name,
-        cs.shortform_content_url,
-        cs.like_count
+        cs.content_url AS shortform_content_url,
+        cs.shortform_like_count AS like_count
     FROM 
         content_shortform cs
     JOIN 
         product_info pi ON cs.product_id = pi.product_id
     WHERE 
-        cs.trade_status IN ('trading', 'bidding')  -- ✅ 거래 또는 입찰 가능
+        cs.product_id IS NOT NULL
+        AND NOT EXISTS (
+            SELECT 1
+            FROM ecommerce_order eo
+            WHERE eo.product_id = cs.product_id
+              AND eo.order_status = 'PAYMENT_COMPLETE'
+        )
     ORDER BY 
-        cs.like_count DESC
+        cs.shortform_like_count DESC
     LIMIT #{size} OFFSET #{offset}
 """)
     List<ProductKatteRecommendBean> getKatteRecommendedProducts(
             @Param("offset") int offset,
             @Param("size") int size);
 
-    // 브랜드 매출 높은순 리스트
     @Select("""
     SELECT 
-        pi.*,
-        COUNT(eo.id) AS order_count
+        pi.*
     FROM 
         product_info pi
     JOIN 
@@ -224,12 +226,24 @@ public interface ProductMapper {
     GROUP BY 
         pi.product_id
     ORDER BY 
-        order_count DESC
+        COUNT(eo.id) DESC
     LIMIT #{size} OFFSET #{offset}
 """)
-    List<ProductInfoBean> getTop5ProductsByBrandOrderCount(
+    List<ProductInfoBean> getTopProductsByBrandOrderCount(
             @Param("brand_name") String brand_name,
             @Param("offset") int offset,
+            @Param("size") int size
+    );
+
+    @Select("""
+    SELECT *
+    FROM product_info
+    WHERE brand_name = #{brand_name}
+    ORDER BY RAND()
+    LIMIT #{size}
+""")
+    List<ProductInfoBean> getRandomProductsByBrand(
+            @Param("brand_name") String brand_name,
             @Param("size") int size
     );
 
@@ -414,4 +428,18 @@ public interface ProductMapper {
     //경매 시간 세팅을 위한
     @Select("SELECT auction_data_id FROM product_per_sale WHERE id = #{perSaleId}")
     int getAuctionIdByPerSaleId(@Param("perSaleId") int perSaleId);
+
+    //관심상품등록.
+    @Insert("""
+    INSERT INTO `product_like` (user_id, product_id, created_at)
+    VALUES (#{user_id}, #{product_id}, NOW())""")
+    int insertWishlist(@Param("user_id") int userId, @Param("product_id") int productId);
+
+    //관심상품조회
+    @Select("""
+    SELECT COUNT(*) 
+    FROM `product_like`
+    WHERE user_id = #{user_id} AND product_id = #{product_id}""")
+    int countWishlistItem(@Param("user_id") int userId, @Param("product_id") int productId);
+
 }
