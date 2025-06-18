@@ -106,22 +106,20 @@ public interface ProductMapper {
 
     // 상품 사이즈별 최저가 조회
     @Select("""
-    SELECT
-    ps.size_value AS auction_size_value,
-    MIN(ad.instant_price) AS price
-    FROM
-    product_size ps
-    LEFT JOIN
-    auction_data ad
-    ON
-    ps.id = ad.product_size_id
-    AND ad.is_instant_sale = true
-    WHERE
-    ps.product_id = #{product_id}
-    GROUP BY
-    ps.size_value
-    ORDER BY
-    ps.size_value
+SELECT
+  ps.size_value AS auction_size_value,
+  MIN(ad.instant_price) AS price
+FROM
+  product_size ps
+LEFT JOIN
+  auction_data ad ON ps.id = ad.product_size_id
+WHERE
+  ps.product_id = #{product_id}
+  AND (ad.is_instant_sale = true OR ad.id IS NULL)
+GROUP BY
+  ps.size_value
+ORDER BY
+  ps.size_value
 """)
     List<ProductSizeWithPriceBean> getSizeOptionsWithPrices(@Param("product_id") int product_id);
 

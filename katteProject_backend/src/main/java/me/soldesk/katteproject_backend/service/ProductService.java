@@ -95,9 +95,15 @@ public class ProductService {
         return productMapper.getKatteRecommendedProducts(offset, size);
     }
 
-    //브랜드 매출 높은 상품 리스트 조회
     public List<ProductInfoBean> getTopProductsByBrandOrderCount(String brand_name, int offset, int size) {
-        return productMapper.getTop5ProductsByBrandOrderCount(brand_name, offset, size);
+        List<ProductInfoBean> topList = productMapper.getTopProductsByBrandOrderCount(brand_name, offset, size);
+
+        // 만약 해당 브랜드의 주문이력 있는 상품이 없을 경우 → 랜덤 상품 리스트 반환
+        if (topList == null || topList.isEmpty()) {
+            topList = productMapper.getRandomProductsByBrand(brand_name, size);
+        }
+
+        return topList;
     }
 
     // 현재 보고있는 상품과 같이 조회된 상품 리스트 조회
@@ -248,6 +254,14 @@ public class ProductService {
     //전체 판매 완료 수 조회
     public int getSoldOutProductCount() {
         return productMapper.getSoldOutCount();
+    }
+
+    //관심상품등록
+    public boolean addProductToWishlist(int userId, int productId) {
+        if (productMapper.countWishlistItem(userId, productId) > 0) {
+            return false; // 이미 등록되어 있음
+        }
+        return productMapper.insertWishlist(userId, productId) == 1;
     }
 
 }
