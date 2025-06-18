@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -157,6 +159,25 @@ public class AuctionController {
             @RequestParam("product_id") int productId
     ) {
         return ResponseEntity.ok(auctionService.getLowestSellPriceBySize(productId));
+    }
+
+    // 🟡 입찰 마감일 조회 API
+    @GetMapping("auction/end_time")
+    public ResponseEntity<String> getAuctionEndTime(
+            @RequestParam("product_id") int productId,
+            @RequestParam("size") String sizeValue) {
+
+        Date endTime = auctionService.getAuctionEndTime(productId, sizeValue);
+
+        if (endTime == null) {
+            return ResponseEntity.ok("마감 정보 없음");
+        }
+
+        // ✅ Date → String 변환 (ex: 2025-06-20 23:59)
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String endTimeStr = sdf.format(endTime);
+
+        return ResponseEntity.ok(endTimeStr);
     }
 
 }

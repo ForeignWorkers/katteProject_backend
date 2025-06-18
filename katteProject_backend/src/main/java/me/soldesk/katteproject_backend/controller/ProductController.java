@@ -5,16 +5,19 @@ import common.bean.ecommerce.EcommerceOrderBean;
 import common.bean.product.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import me.soldesk.katteproject_backend.service.ProductService;
 import common.bean.admin.*;
 import common.bean.product.ProductPriceSummaryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ProductController {
@@ -65,7 +68,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/product/size_options/prices")
+    @GetMapping("/product/size_prices")
     @Operation(summary = "사이즈별 최저 즉시판매가 조회", description = "상품 ID에 대해 각 사이즈별 최저 즉시판매가를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음")
@@ -328,5 +331,25 @@ public class ProductController {
         return ResponseEntity.ok(productService.getSoldOutProductCount());
     }
 
+    @PostMapping("/product/wishlist")
+    @Operation(summary = "관심상품 등록", description = "로그인된 사용자 기준으로 상품을 관심상품 리스트에 추가합니다.")
+    @ApiResponse(responseCode = "200", description = "등록 성공")
+    @ApiResponse(responseCode = "409", description = "이미 등록된 항목")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    public ResponseEntity<String> addToWishlist(@RequestBody Map<String, Integer> body, HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("user_id");
+        if (userId == null) userId = 28; // Postman 테스트용
+        Integer productId = body.get("product_id");
 
+        if (userId == null || productId == null) {
+            return ResponseEntity.badRequest().body("Missing user_id or product_id");
+        }
+
+        boolean added = productService.addProductToWishlist(userId, productId);
+        if (!added) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Already exists");
+        }
+
+        return ResponseEntity.ok("Added");
+    }
 }

@@ -172,4 +172,9 @@ public class AuctionService {
     public List<ProductSizeWithSellPriceBean> getLowestSellPriceBySize(int productId) {
         return auctionMapper.getLowestSellPriceBySize(productId);
     }
+
+    //경매마감시간 get.
+    public Date getAuctionEndTime(int productId, String auctionSizeValue) {
+        return auctionMapper.getAuctionEndTime(productId, auctionSizeValue);
+    }
 }
