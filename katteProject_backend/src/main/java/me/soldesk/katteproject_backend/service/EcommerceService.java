@@ -1,6 +1,7 @@
 package me.soldesk.katteproject_backend.service;
 
 import common.bean.ecommerce.*;
+import common.bean.product.ProductInfoBean;
 import me.soldesk.katteproject_backend.mapper.EcommerceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,6 @@ public class EcommerceService {
 
     // 주문 생성
     public int createAuctionOrder(EcommerceOrderBean request) {
-        request.setOrdered_at(new Date());
         request.setOrder_status(EcommerceOrderBean.OrderStatus.PAYMENT_COMPLETE);
         ecommerceMapper.insertOrder(request);
         return request.getOrder_id();
@@ -56,8 +56,8 @@ public class EcommerceService {
     // 구매확정
     @Transactional
     public boolean confirmOrder(int orderId, int userId) {
-        String orderStatus = ecommerceMapper.getOrderStatus(orderId, userId);
-        if (!"delivered".equals(orderStatus)) return false;
+        /*String orderStatus = ecommerceMapper.getOrderStatus(orderId, userId);
+        if (!"DELIVERED".equals(orderStatus)) return false;*/
 
         boolean alreadyConfirmed = ecommerceMapper.isAlreadyBuyComplete(orderId);
         if (alreadyConfirmed) return false;
@@ -121,5 +121,9 @@ public class EcommerceService {
 
     public List<EcommerceTradeLookUp> getTradeLookUp(int product_id, LocalDateTime formDate) {
         return ecommerceMapper.getTradesByProductAndDate(product_id, formDate);
+    }
+
+    public ProductInfoBean getProductInfoByProductId(int product_id) {
+        return ecommerceMapper.getProductInfoByProductId(product_id);
     }
 }

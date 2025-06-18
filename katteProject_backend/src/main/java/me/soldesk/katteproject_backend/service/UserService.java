@@ -1,5 +1,6 @@
 package me.soldesk.katteproject_backend.service;
 
+import common.bean.product.ProductBrandLikeBean;
 import common.bean.user.*;
 import lombok.RequiredArgsConstructor;
 import me.soldesk.katteproject_backend.mapper.UserMapper;
@@ -191,5 +192,10 @@ public class UserService {
     public Boolean getUserByEmail(String email_id) {
         return userMapper.getUserByEmail(email_id) != null;
     }
+
+    public List<ProductBrandLikeBean> getProductBrandLike(String user_id) {
+        return userMapper.getProductBrandLike(Integer.parseInt(user_id));
+    }
+
 
 }
