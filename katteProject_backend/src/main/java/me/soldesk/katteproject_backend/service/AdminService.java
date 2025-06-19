@@ -1,5 +1,6 @@
 package me.soldesk.katteproject_backend.service;
 
+import common.bean.admin.SoldoutProductViewBean;
 import common.bean.product.ProductCheckResultBean;
 import lombok.RequiredArgsConstructor;
 import me.soldesk.katteproject_backend.mapper.AdminMapper;
@@ -208,5 +209,17 @@ public class AdminService {
     public void updateExpiredSales() {
         adminMapper.updateExpiredSales();
     }
+
+    // 판매 완료 리스트
+    public List<SoldoutProductViewBean> getSoldOutItems(int offset, int size) {
+        return adminMapper.getSoldOutProductList(offset, size);
+    }
+
+    //판매 완료 수
+    public int getSoldOutCount() {
+        return adminMapper.getSoldOutProductCount();
+    }
+
+
 
 }
