@@ -210,16 +210,5 @@ public class AdminService {
         adminMapper.updateExpiredSales();
     }
 
-    // 판매 완료 리스트
-    public List<SoldoutProductViewBean> getSoldOutItems(int offset, int size) {
-        return adminMapper.getSoldOutProductList(offset, size);
-    }
-
-    //판매 완료 수
-    public int getSoldOutCount() {
-        return adminMapper.getSoldOutProductCount();
-    }
-
-
 
 }

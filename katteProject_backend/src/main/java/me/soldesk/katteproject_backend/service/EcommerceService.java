@@ -88,20 +88,30 @@ public class EcommerceService {
 
     // 정산 처리
     @Transactional
-    public void settleOrder(int auctionId) {
+    public String settleOrder(int auctionId) {
+        // 중복 정산 여부 확인
         Boolean alreadySettled = ecommerceMapper.isAlreadySettled(auctionId);
-        if (Boolean.TRUE.equals(alreadySettled)) return;
+        if (Boolean.TRUE.equals(alreadySettled)) {
+            return String.format("auction_id=%d 는 이미 정산 처리되었습니다.", auctionId);
+        }
 
+        // 정산 대상 정보 조회
         EcommerceSettlementLogBean info = ecommerceMapper.getSettlementInfo(auctionId);
-        if (info == null) return;
+        if (info == null) {
+            return String.format("auction_id=%d 에 대한 정산 대상 정보가 존재하지 않습니다.", auctionId);
+        }
 
-        int reward = (int) (info.getFinal_price() * (1 - FEE_RATE));
+        // 정산 금액 계산 및 세팅
+        int reward = (int) (info.getFinal_price() * (1 - FEE_RATE)); // 수수료 적용
         info.setReward_amount(reward);
         info.setFee_rate(FEE_RATE);
         info.setAuction_id(auctionId);
 
+        // 로그 기록 및 상태 변경
         ecommerceMapper.insertSettlementLog(info);
         ecommerceMapper.markSettlementDone(auctionId);
+
+        return String.format("auction_id=%d 의 정산이 완료되었습니다. 지급 금액: %d원", auctionId, reward);
     }
 
     // 주문 상세 조회

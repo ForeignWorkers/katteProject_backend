@@ -112,8 +112,13 @@ public class EcommerceController {
     @ApiResponse(responseCode = "400", description = "정산 조건 미충족 또는 중복 정산")
     @PostMapping("/settlement")
     public ResponseEntity<String> processSettlement(@RequestParam int auction_id) {
-        ecommerceService.settleOrder(auction_id);
-        return ResponseEntity.ok("정산 처리 완료");
+        String result = ecommerceService.settleOrder(auction_id);
+
+        if (result.contains("정산이 완료되었습니다")) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.badRequest().body(result);
+        }
     }
 
     @GetMapping("/trade")

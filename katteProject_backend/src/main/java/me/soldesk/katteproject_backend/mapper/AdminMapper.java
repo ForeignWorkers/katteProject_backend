@@ -253,19 +253,5 @@ public interface AdminMapper {
     """)
     void updateExpiredSales();
 
-    //판매 완료 리스트 조회
-    @Select("""
-    SELECT * FROM soldout_product_view
-    ORDER BY ordered_at DESC
-    LIMIT #{size} OFFSET #{offset}
-    """)
-    List<SoldoutProductViewBean> getSoldOutProductList(
-            @Param("offset") int offset,
-            @Param("size") int size
-    );
-
-    //판매 완료 수 조회
-    @Select("SELECT COUNT(*) FROM soldout_product_view")
-    int getSoldOutProductCount();
 
 }

@@ -243,25 +243,5 @@ public class AdminController {
         return ResponseEntity.ok(String.format("auction_id=%d → 즉시 삭제 대상으로 설정됨", auctionId));
     }
 
-    // 판매 완료 리스트 조회 (페이징 포함)
-    @GetMapping("/soldout")
-    public String viewSoldOutList(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Model model
-    ) {
-        int offset = (page - 1) * size;
-
-        List<SoldoutProductViewBean> soldoutList = adminService.getSoldOutItems(offset, size);
-        int soldoutCount = adminService.getSoldOutCount();
-        int totalPages = Math.max(1, (int) Math.ceil((double) soldoutCount / size));
-
-        model.addAttribute("soldoutList", soldoutList);
-        model.addAttribute("soldoutCount", soldoutCount);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-
-        return "AdminPage/SoldoutProductList";
-    }
 
 }

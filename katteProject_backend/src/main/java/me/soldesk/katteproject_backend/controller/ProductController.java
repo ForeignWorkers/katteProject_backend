@@ -315,8 +315,7 @@ public class ProductController {
     @GetMapping("/products/soldout")
     @Operation(summary = "판매 완료 내역 조회", description = "판매 완료된(sold_out) 항목의 목록을 반환합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
-    @ApiResponse(responseCode = "400", description = "파라미터 에러")
-    public ResponseEntity<List<InspectionProductViewBean>> getSoldOutList(
+    public ResponseEntity<List<SoldoutProductViewBean>> getSoldOutList(
             @RequestParam(defaultValue = "0") int offset,
             @RequestParam(defaultValue = "10") int size
     ) {
@@ -324,9 +323,8 @@ public class ProductController {
     }
 
     @GetMapping("/products/soldout/count")
-    @Operation(summary = "판매 완료 항목 수 조회", description = "판매 완료 상태(sold_out)인 항목의 총 갯수를 반환합니다.")
+    @Operation(summary = "판매 완료 항목 수 조회", description = "판매 완료 상태 항목의 총 갯수를 반환합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
-    @ApiResponse(responseCode = "400", description = "요청 실패")
     public ResponseEntity<Integer> getSoldOutCount() {
         return ResponseEntity.ok(productService.getSoldOutProductCount());
     }
