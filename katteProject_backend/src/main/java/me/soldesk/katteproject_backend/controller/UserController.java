@@ -202,6 +202,14 @@ public class UserController {
         return ResponseEntity.ok("요청이 완료 되었습니다. 현재 머니 : " + currentMoney);
     }
 
+    @PatchMapping("/user/point")
+    ///API Docs
+    @Operation(summary = "katte 포인트 변경 요청", description = "포인트 변경")
+    public ResponseEntity<String> updatePoint(@RequestParam("user_id") int user_id,@RequestParam("point") int point) {
+        userService.updatePoint(point,user_id);
+        return ResponseEntity.ok("변경 완료 되었습니다. 현재 머니 : ");
+    }
+
     @PostMapping("/user/katte/refund")
     @Operation(summary = "katte 머니 환불 요청", description = "환불 요청 후 잔액 차감 및 로그 기록")
     @ApiResponse(responseCode = "200", description = "환불 요청 완료")

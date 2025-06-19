@@ -197,5 +197,8 @@ public class UserService {
         return userMapper.getProductBrandLike(Integer.parseInt(user_id));
     }
 
+    public void updatePoint(int point, int user_id) {
+        userMapper.updatePoint(user_id, point);
+    }
 
 }

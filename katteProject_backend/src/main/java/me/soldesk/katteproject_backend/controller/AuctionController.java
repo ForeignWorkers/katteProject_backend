@@ -180,4 +180,10 @@ public class AuctionController {
         return ResponseEntity.ok(endTimeStr);
     }
 
+
+    @GetMapping("auction/getData")
+    public ResponseEntity<AuctionDataBean> getAuctionData(@RequestParam("product_id") int product_id,
+                                                          @RequestParam("instant_price") int instant_price){
+        return ResponseEntity.ok(auctionService.getAuctionData(product_id, instant_price));
+    }
 }

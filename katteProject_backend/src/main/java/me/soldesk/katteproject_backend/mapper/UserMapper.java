@@ -150,6 +150,9 @@ public interface UserMapper {
     @Update("UPDATE user_payment SET katte_money = #{katte_money} WHERE user_id = #{user_id}")
     void updateKatteMoney(int user_id, int katte_money);
 
+    @Update("UPDATE user_payment SET point = #{point} WHERE user_id = #{user_id}")
+    void updatePoint(int user_id, int point);
+
     @Insert("INSERT INTO user_katte_money_log " +
             "(user_id, change_amount, reason, created_at) " +
             "VALUE (#{user_id}, #{change_amount}, #{reason}, NOW())")

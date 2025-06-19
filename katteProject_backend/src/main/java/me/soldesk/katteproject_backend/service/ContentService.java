@@ -23,7 +23,10 @@ public class ContentService {
     }
 
     public ContentShortformBean getShortformById(int id) {
-        return contentMapper.getShortformById(id);
+        ContentShortformBean bean = contentMapper.getShortformById(id);
+        contentMapper.incrementViewCount(bean.getId());
+        bean.setTotal_view(bean.getTotal_view() + 1);
+        return bean;
     }
 
     public List<ContentShortformBean> getShortformsByProjectId(int projectId, int count, int offset) {

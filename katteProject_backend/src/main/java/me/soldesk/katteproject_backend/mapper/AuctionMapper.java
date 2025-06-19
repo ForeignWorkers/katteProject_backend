@@ -199,4 +199,10 @@ public interface AuctionMapper {
     ORDER BY auction_size_value
 """)
     List<ProductSizeWithSellPriceBean> getLowestSellPriceBySize(@Param("product_id") int productId);
+
+
+    @Select("""
+            SELECT * FROM auction_data WHERE product_id = #{product_id} AND instant_price=#{instant_price}
+            """)
+    AuctionDataBean getDataAuctionData(@Param("product_id") int product_id, @Param("instant_price") int instant_price);
 }

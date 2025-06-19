@@ -177,4 +177,8 @@ public class AuctionService {
     public Date getAuctionEndTime(int productId, String auctionSizeValue) {
         return auctionMapper.getAuctionEndTime(productId, auctionSizeValue);
     }
+
+    public AuctionDataBean getAuctionData(int product_id, int instant_price) {
+        return auctionMapper.getDataAuctionData(product_id, instant_price);
+    }
 }
