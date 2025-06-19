@@ -388,29 +388,17 @@ ORDER BY
 
     //판매 완료 상품 리스트 조회
     @Select("""
-    SELECT
-        p.product_name,
-        cs.title,
-        u.email_id AS buyer_email_id,
-        ad.auction_end_time,
-        ad.is_settle_amount
-    FROM auction_data ad
-    JOIN product_per_sale ps ON ad.id = ps.auction_data_id
-    JOIN product_info p ON ps.product_id = p.product_id
-    JOIN content_shortform cs ON ps.shortform_id = cs.id
-    JOIN user_info u ON ps.sale_user_id = u.user_id
-    JOIN product_check_result pcr ON pcr.per_sale_id = ps.id
-    WHERE pcr.sale_step = 'sold_out'
-    ORDER BY ad.auction_end_time DESC
+    SELECT *
+    FROM soldout_product_view
+    ORDER BY ordered_at DESC
     LIMIT #{size} OFFSET #{offset}
     """)
-    List<InspectionProductViewBean> getSoldOutList(@Param("offset") int offset, @Param("size") int size);
+    List<SoldoutProductViewBean> getSoldOutList(@Param("offset") int offset, @Param("size") int size);
 
     //판매 완료 상품 수
     @Select("""
     SELECT COUNT(*)
-    FROM product_check_result pcr
-    WHERE pcr.sale_step = 'sold_out'
+    FROM soldout_product_view
     """)
     int getSoldOutCount();
 

@@ -247,7 +247,7 @@ public class ProductService {
     }
 
     //판매 완료 내역 리스트 조회
-    public List<InspectionProductViewBean> getSoldOutProductList(int offset, int size) {
+    public List<SoldoutProductViewBean> getSoldOutProductList(int offset, int size) {
         return productMapper.getSoldOutList(offset, size);
     }
 
