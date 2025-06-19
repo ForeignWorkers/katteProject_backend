@@ -33,4 +33,23 @@ public class StyleService {
 
         return style;
     }
+
+    //등록한 스타일 갯수 반환
+    public int countStyleByUserId(int user_id){ return mapper.countStyleByUserId(user_id);}
+
+    //스타일 반환
+    public List<ContentStyleBean> getStyleByUserId(int user_id, int page, int size){
+        int offset = page * size;
+
+        List<ContentStyleBean> style = mapper.selectStylesByUserId(user_id, new RowBounds(offset, size));
+
+        for(ContentStyleBean styles : style){
+            List<String> urls = mapper.selectImageUrlsByStyleId(styles.getId());
+            styles.setImageUrls(urls);
+        }
+
+        return style;
+
+    }
+
 }

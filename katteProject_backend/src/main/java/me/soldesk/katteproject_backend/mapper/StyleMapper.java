@@ -15,6 +15,20 @@ public interface StyleMapper {
     @Select("SELECT COUNT(*) FROM content_style")
     int countAllStyles();
 
+    @Select("select count(*) from content_style where user_id = #{user_id}")
+    int countStyleByUserId(@Param("user_id") int user_id);
+
+    @Select("select * from content_style where user_id = #{user_id} order by id desc")
+    List<ContentStyleBean> selectStyleByUserId(@Param("user_id") int user_id);
+
+    @Select("""
+        SELECT *
+          FROM content_style
+          WHERE user_id = #{user_id}
+         ORDER BY created_date DESC
+        """)
+    List<ContentStyleBean> selectStylesByUserId(@Param("user_id") int user_id, RowBounds rowBounds);
+
     /** offset, limit 기반으로 최신순 조회 (목록) */
     @Select("""
         SELECT *
