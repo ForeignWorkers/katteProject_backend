@@ -173,7 +173,7 @@ VALUES (#{user_id}, #{order_id}, NOW(), TRUE)
 
     // 유저 주문 이력 조회
     @Select("""
-SELECT o.id AS order_id, o.product_id, o.final_price, o.ordered_at,
+SELECT o.id AS order_id, o.product_id, o.origin_price, o.ordered_at,
        b.is_buy_complete, b.buy_complete_at
 FROM ecommerce_order o
 LEFT JOIN ecommerce_buy_complete b ON o.id = b.order_id
